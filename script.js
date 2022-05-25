@@ -39,9 +39,10 @@ window.addEventListener('load', function(){
             this.width = 65;
             this.height = 25;
             this.x = 0;
-            this.y = gameHeight/2 - 50;
+            this.y = gameHeight/2 - this.height;
             this.image = document.getElementById('playerImage');
-            this.speed = 0;
+            this.xSpeed = 0;
+            this.ySpeed = 0;
         }
         draw(context){
             context.fillStyle = 'white';
@@ -50,16 +51,28 @@ window.addEventListener('load', function(){
         }
         update(input){
             // horizontal movement
-            this.x += this.speed;
+            this.x += this.xSpeed;
             if(input.keys.indexOf('ArrowRight') > -1){
-                this.speed = 5;
+                this.xSpeed = 5;
             } else if(input.keys.indexOf('ArrowLeft') > -1){
-                this.speed = -5;
+                this.xSpeed = -5;
             } else {
-                this.speed = 0;
+                this.xSpeed = 0;
             }
             if(this.x < 0) this.x = 0;
             else if(this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+
+            // vertical movement
+            this.y += this.ySpeed;
+            if(input.keys.indexOf('ArrowUp') > -1){
+                this.ySpeed = -5;
+            } else if(input.keys.indexOf('ArrowDown') > -1){
+                this.ySpeed = 5;
+            } else {
+                this.ySpeed = 0;
+            }
+            if(this.y < 0) this.y = 0;
+            else if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height;
         }
     }
 
