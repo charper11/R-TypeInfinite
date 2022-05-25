@@ -33,7 +33,34 @@ window.addEventListener('load', function(){
 
     //react to keys as they are pressed, drawing/updating player
     class Player {
-
+        constructor(gameWidth, gameHeight){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 65;
+            this.height = 25;
+            this.x = 0;
+            this.y = gameHeight/2 - 50;
+            this.image = document.getElementById('playerImage');
+            this.speed = 0;
+        }
+        draw(context){
+            context.fillStyle = 'white';
+            context.fillRect(this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
+        update(input){
+            // horizontal movement
+            this.x += this.speed;
+            if(input.keys.indexOf('ArrowRight') > -1){
+                this.speed = 5;
+            } else if(input.keys.indexOf('ArrowLeft') > -1){
+                this.speed = -5;
+            } else {
+                this.speed = 0;
+            }
+            if(this.x < 0) this.x = 0;
+            else if(this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+        }
     }
 
     //endlessly scrolling background
@@ -57,9 +84,14 @@ window.addEventListener('load', function(){
     }
 
     const input = new InputHandler();
+    const player = new Player(canvas.width, canvas.height);
 
     //main animation loop running at 60fps
     function animate(){
-
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+        player.draw(ctx);
+        player.update(input);
+        requestAnimationFrame(animate);
     }
+    animate();
 });
