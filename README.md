@@ -1,1 +1,1 @@
-# R-TypeInfinite
+# R-Type Infinite
