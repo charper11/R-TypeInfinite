@@ -7,7 +7,28 @@ window.addEventListener('load', function(){
 
     //apply event listeners to keyboard events and hold array of all currently active keys
     class InputHandler {
-
+        constructor(){
+            this.keys = [];
+            //add key to keys array on keydown
+            window.addEventListener('keydown', e => {
+                if ((   e.key === 'ArrowDown' ||
+                        e.key === 'ArrowUp' ||
+                        e.key === 'ArrowLeft' ||
+                        e.key === 'ArrowRight')
+                        && this.keys.indexOf(e.key) === -1){
+                    this.keys.push(e.key);
+                }
+            });
+            //remove key from key array on keyup
+            window.addEventListener('keyup', e => {
+                if (    e.key === 'ArrowDown'  ||
+                        e.key === 'ArrowUp' ||
+                        e.key === 'ArrowLeft' ||
+                        e.key === 'ArrowRight'){
+                    this.keys.splice(this.keys.indexOf(e.key), 1);
+                }
+            });
+        }
     }
 
     //react to keys as they are pressed, drawing/updating player
@@ -35,8 +56,10 @@ window.addEventListener('load', function(){
 
     }
 
+    const input = new InputHandler();
+
     //main animation loop running at 60fps
     function animate(){
-        
+
     }
 });
