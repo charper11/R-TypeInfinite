@@ -107,9 +107,10 @@ window.addEventListener('load', function(){
 
     //add, animate, and remove enemies
     function handleEnemies(deltaTime){
-        if(enemyTimer > enemyInterval) {
+        if(enemyTimer > enemyInterval + randomEnemyInterval) {
             enemies.push(new Enemy(canvas.width, canvas.height));
             enemyTimer = 0;
+            randomEnemyInterval = Math.random()*1000;
         } else {
             enemyTimer += deltaTime;
         }
@@ -130,6 +131,7 @@ window.addEventListener('load', function(){
     let lastTime = 0;
     let enemyTimer = 0;
     let enemyInterval = 1000;
+    let randomEnemyInterval = Math.random()*1000;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
