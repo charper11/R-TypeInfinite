@@ -4,6 +4,7 @@ window.addEventListener('load', function(){
     const ctx = canvas.getContext('2d');
     canvas.width = 900;
     canvas.height = 550;
+    let enemies = [];
 
     //apply event listeners to keyboard events and hold array of all currently active keys
     class InputHandler {
@@ -84,12 +85,38 @@ window.addEventListener('load', function(){
 
     //generate enemies
     class Enemy {
+        constructor(gameWidth, gameHeight){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 107;
+            this.height = 115;
+            this.image = document.getElementById("enemyImage");
+            this.x = this.gameWidth;
+            this.y = 0;
+            this.speed = 8;
+        }
 
+        draw(context){
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update(){
+            this.x -= this.speed;
+        }
     }
 
     //add, animate, and remove enemies
-    function handleEnemies(){
-
+    function handleEnemies(deltaTime){
+        if(enemyTimer > enemyInterval) {
+            enemies.push(new Enemy(canvas.width, canvas.height));
+            enemyTimer = 0;
+        } else {
+            enemyTimer += deltaTime;
+        }
+        enemies.forEach(enemy => {
+            enemy.draw(ctx);
+            enemy.update();
+        });
     }
 
     //display score and game over message
@@ -99,13 +126,20 @@ window.addEventListener('load', function(){
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
+    //helper vars for generating enemies on time
+    let lastTime = 0;
+    let enemyTimer = 0;
+    let enemyInterval = 1000;
 
     //main animation loop running at 60fps
-    function animate(){
+    function animate(timeStamp){
+        const deltaTime = timeStamp - lastTime;
+        lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
         player.draw(ctx);
         player.update(input);
+        handleEnemies(deltaTime);
         requestAnimationFrame(animate);
     }
-    animate();
+    animate(0);
 });
