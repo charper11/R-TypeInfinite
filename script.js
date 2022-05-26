@@ -50,12 +50,13 @@ window.addEventListener('load', function(){
             context.drawImage(this.image, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(input){
+            const PLAYER_SPEED = 7;
             // horizontal movement
             this.x += this.xSpeed;
             if(input.keys.indexOf('ArrowRight') > -1){
-                this.xSpeed = 5;
+                this.xSpeed = PLAYER_SPEED;
             } else if(input.keys.indexOf('ArrowLeft') > -1){
-                this.xSpeed = -5;
+                this.xSpeed = -PLAYER_SPEED;
             } else {
                 this.xSpeed = 0;
             }
@@ -65,9 +66,9 @@ window.addEventListener('load', function(){
             // vertical movement
             this.y += this.ySpeed;
             if(input.keys.indexOf('ArrowUp') > -1){
-                this.ySpeed = -5;
+                this.ySpeed = -PLAYER_SPEED;
             } else if(input.keys.indexOf('ArrowDown') > -1){
-                this.ySpeed = 5;
+                this.ySpeed = PLAYER_SPEED;
             } else {
                 this.ySpeed = 0;
             }
