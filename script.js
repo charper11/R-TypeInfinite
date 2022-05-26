@@ -92,7 +92,7 @@ window.addEventListener('load', function(){
             this.height = 115;
             this.image = document.getElementById("enemyImage");
             this.x = this.gameWidth;
-            this.y = 0;
+            this.y = Math.random() * (this.gameHeight - this.height);
             this.speed = 8;
         }
 
