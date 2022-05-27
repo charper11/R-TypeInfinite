@@ -97,8 +97,8 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight, x, y){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 107;
-            this.height = 115;
+            this.width = 33;
+            this.height = 9;
             this.image = document.getElementById("playerLaserImage");
             this.x = x;
             this.y = y;
