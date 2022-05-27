@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "Orbitron";
+    src: local("Orbitron"), url("Orbitron-VariableFont_wght.ttf") format("truetype");
+}
+
 body {
     background: black;
 }

@@ -127,11 +127,10 @@ window.addEventListener('load', function(){
     //display score and game over message
     function displayStatusText(context){
         context.fillStyle = 'white';
-        //context.font = 'Orbitron';
+        context.font = '20px Orbitron';
         context.fillText('Score: ' + score, 20, 50);
         if(gameOver){
             context.textAlign = 'center';
-            context.fillStyle = 'white';
             context.fillText('GAME OVER', canvas.width/2, canvas.height/2);
         }
     }
