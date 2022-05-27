@@ -252,7 +252,7 @@ window.addEventListener('load', function(){
                 this.y < player.y + player.height &&
                 this.y + this.height > player.y){
                     this.markedForDeletion = true;
-                    equippedShields.push(new ShieldEquipped(player.x, player.y));
+                    if(equippedShields.length === 0) equippedShields.push(new ShieldEquipped(player.x, player.y));
                 }
 
             //if shield goes off screen, delete
@@ -265,7 +265,7 @@ window.addEventListener('load', function(){
         if (shieldTimer > randomShieldInterval) {
             shields.push(new ShieldItem(canvas.width, canvas.height));
             shieldTimer = 0;
-            randomShieldInterval = Math.random() * 120000;
+            randomShieldInterval = (Math.random() * 120000) + 120000;
         } else {
             shieldTimer += deltaTime;
         }
@@ -295,6 +295,17 @@ window.addEventListener('load', function(){
         update(x, y) {
             this.x = x;
             this.y = y-50;
+
+            //detect collision
+            enemies.forEach(enemy => {
+                if(this.x < enemy.x + enemy.width &&
+                   this.x + this.width > enemy.x &&
+                   this.y < enemy.y + enemy.height &&
+                   this.y + this.height > enemy.y){
+                    enemy.markedForDeletion = true;
+                    score += 10;
+                   }
+            });
         }
     }
 
