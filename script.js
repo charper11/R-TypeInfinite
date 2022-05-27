@@ -6,6 +6,7 @@ window.addEventListener('load', function(){
     canvas.height = 550;
     let enemies = [];
     let playerLasers = [];
+    let stars = [];
     let score = 0;
     let gameOver = false;
 
@@ -144,9 +145,40 @@ window.addEventListener('load', function(){
         playerLasers = playerLasers.filter(laser => !laser.markedForDeletion);
     }
 
-    //endlessly scrolling background
-    class Background {
+    //star object for background
+    class Star {
+        constructor(gameWidth, gameHeight){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 1;
+            this.height = 1;
+            this.x = this.gameWidth;
+            this.y = Math.random() * (this.gameHeight - this.height);
+            this.speed = 4;
+            this.markedForDeletion = false;
+        }
 
+        draw(context){
+            context.fillStyle = 'white';
+            context.fillRect(this.x, this.y, this.width, this.height);
+        }
+
+        update(){
+            this.x -= this.speed;
+            //if star goes off screen, delete
+            if(this.x < 0 - this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //endlessly scrolling background
+    function background(){
+        stars.push(new Star(canvas.width, canvas.height));
+        stars.forEach(star => {
+            star.draw(ctx);
+            star.update();
+        });
+        //remove stars from array
+        stars = stars.filter(star => !star.markedForDeletion);
     }
 
     //generate enemies
@@ -199,6 +231,7 @@ window.addEventListener('load', function(){
         if(gameOver){
             context.textAlign = 'center';
             context.fillText('GAME OVER', canvas.width/2, canvas.height/2);
+            context.fillText('Press SPACE to play again', canvas.width/2, canvas.height/2+100);
         }
     }
 
@@ -229,6 +262,7 @@ window.addEventListener('load', function(){
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
+        background();
         player.draw(ctx);
         player.update(input);
         handlePlayerLaser(input, player.x, player.y, deltaTime);
