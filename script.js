@@ -6,6 +6,7 @@ window.addEventListener('load', function(){
     canvas.height = 550;
     let enemies = [];
     let score = 0;
+    let gameOver = false;
 
     //apply event listeners to keyboard events and hold array of all currently active keys
     class InputHandler {
@@ -128,6 +129,11 @@ window.addEventListener('load', function(){
         context.fillStyle = 'white';
         //context.font = 'Orbitron';
         context.fillText('Score: ' + score, 20, 50);
+        if(gameOver){
+            context.textAlign = 'center';
+            context.fillStyle = 'white';
+            context.fillText('GAME OVER', canvas.width/2, canvas.height/2);
+        }
     }
 
     function updateScore(deltaTime){
@@ -159,7 +165,7 @@ window.addEventListener('load', function(){
         handleEnemies(deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx);
-        requestAnimationFrame(animate);
+        if(!gameOver) requestAnimationFrame(animate);
     }
     animate(0);
 });
