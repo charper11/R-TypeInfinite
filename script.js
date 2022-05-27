@@ -8,6 +8,7 @@ window.addEventListener('load', function(){
     let playerLasers = [];
     let stars = [];
     let shields = [];
+    let equippedShields = [];
     let score = 0;
     let gameOver = false;
 
@@ -244,6 +245,16 @@ window.addEventListener('load', function(){
 
         update() {
             this.x -= this.speed;
+
+            // if player collides with shield item, remove it and add equipped shield object
+            if(this.x < player.x + player.width &&
+                this.x + this.width > player.x &&
+                this.y < player.y + player.height &&
+                this.y + this.height > player.y){
+                    this.markedForDeletion = true;
+                    equippedShields.push(new ShieldEquipped(player.x, player.y));
+                }
+
             //if shield goes off screen, delete
             if (this.x < 0 - this.width) this.markedForDeletion = true;
         }
@@ -264,6 +275,37 @@ window.addEventListener('load', function(){
         });
         //remove gone/equipped shields from array
         shields = shields.filter(shield => !shield.markedForDeletion);
+    }
+
+    //generate equipped shield
+    class ShieldEquipped {
+        constructor(x, y) {
+            this.width = 33;
+            this.height = 25;
+            this.image = document.getElementById("shieldImage");
+            this.x = x;
+            this.y = y-50;
+            this.markedForDeletion = false;
+        }
+
+        draw(context) {
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update(x, y) {
+            this.x = x;
+            this.y = y-50;
+        }
+    }
+
+    //add, animate, and remove equipped shield
+    function handleShieldEquipped(x, y) {
+        equippedShields.forEach(shield => {
+            shield.draw(ctx);
+            shield.update(x, y);
+        });
+        //remove unequipped shields from array
+        equippedShields = equippedShields.filter(shield => !shield.markedForDeletion);
     }
 
     //display score and game over message
@@ -314,6 +356,7 @@ window.addEventListener('load', function(){
         handlePlayerLaser(input, player.x, player.y, deltaTime);
         handleEnemies(deltaTime);
         handleShieldItem(deltaTime);
+        handleShieldEquipped(player.x, player.y);
         updateScore(deltaTime);
         displayStatusText(ctx);
         if(!gameOver) requestAnimationFrame(animate);
