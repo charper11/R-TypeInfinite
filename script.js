@@ -53,7 +53,7 @@ window.addEventListener('load', function(){
         draw(context){
             context.drawImage(this.image, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
-        update(input, enemies){
+        update(input){
             const PLAYER_SPEED = 7;
             // horizontal movement
             this.x += this.xSpeed;
@@ -81,10 +81,10 @@ window.addEventListener('load', function(){
 
             //detect collision
             enemies.forEach(enemy => {
-                if(player.x < enemy.x + enemy.width &&
-                   player.x + player.width > enemy.x &&
-                   player.y < enemy.y + enemy.height &&
-                   player.y + player.height > enemy.y){
+                if(this.x < enemy.x + enemy.width &&
+                   this.x + this.width > enemy.x &&
+                   this.y < enemy.y + enemy.height &&
+                   this.y + this.height > enemy.y){
                        gameOver = true;
                    }
             });
@@ -111,7 +111,20 @@ window.addEventListener('load', function(){
 
         update(){
             this.x += this.speed;
+            //remove laser from array if offscreen
             if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
+
+            //detect collision
+            enemies.forEach(enemy => {
+                if(this.x < enemy.x + enemy.width &&
+                   this.x + this.width > enemy.x &&
+                   this.y < enemy.y + enemy.height &&
+                   this.y + this.height > enemy.y){
+                    this.markedForDeletion = true;
+                    enemy.markedForDeletion = true;
+                    score += 10;
+                   }
+            });
         }
     }
 
@@ -156,6 +169,7 @@ window.addEventListener('load', function(){
 
         update(){
             this.x -= this.speed;
+            //if enemy goes off screen, delete
             if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
     }
@@ -216,9 +230,9 @@ window.addEventListener('load', function(){
         lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
         player.draw(ctx);
-        player.update(input, enemies);
-        handleEnemies(deltaTime);
+        player.update(input);
         handlePlayerLaser(input, player.x, player.y, deltaTime);
+        handleEnemies(deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx);
         if(!gameOver) requestAnimationFrame(animate);
