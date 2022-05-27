@@ -5,6 +5,7 @@ window.addEventListener('load', function(){
     canvas.width = 900;
     canvas.height = 550;
     let enemies = [];
+    let score = 0;
 
     //apply event listeners to keyboard events and hold array of all currently active keys
     class InputHandler {
@@ -118,12 +119,24 @@ window.addEventListener('load', function(){
             enemy.draw(ctx);
             enemy.update();
         });
+        //remove gone/dead enemies from array
         enemies = enemies.filter(enemy => !enemy.markedForDeletion);
     }
 
     //display score and game over message
-    function displayStatusText(){
+    function displayStatusText(context){
+        context.fillStyle = 'white';
+        //context.font = 'Orbitron';
+        context.fillText('Score: ' + score, 20, 50);
+    }
 
+    function updateScore(deltaTime){
+        if(scoreTime > 1000) {
+            score++;
+            scoreTime = 0;
+        } else {
+            scoreTime += deltaTime;
+        }
     }
 
     const input = new InputHandler();
@@ -133,6 +146,8 @@ window.addEventListener('load', function(){
     let enemyTimer = 0;
     let enemyInterval = 1000;
     let randomEnemyInterval = Math.random()*1000;
+    //helper var for score
+    let scoreTime = 0;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
@@ -142,6 +157,8 @@ window.addEventListener('load', function(){
         player.draw(ctx);
         player.update(input);
         handleEnemies(deltaTime);
+        updateScore(deltaTime);
+        displayStatusText(ctx);
         requestAnimationFrame(animate);
     }
     animate(0);
