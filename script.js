@@ -224,47 +224,47 @@ window.addEventListener('load', function(){
         enemies = enemies.filter(enemy => !enemy.markedForDeletion);
     }
 
-        //generate shield items
-        class ShieldItem {
-            constructor(gameWidth, gameHeight){
-                this.gameWidth = gameWidth;
-                this.gameHeight = gameHeight;
-                this.width = 33;
-                this.height = 25;
-                this.image = document.getElementById("shieldImage");
-                this.x = this.gameWidth;
-                this.y = Math.random() * (this.gameHeight - this.height);
-                this.speed = 4;
-                this.markedForDeletion = false;
-            }
-
-            draw(context){
-                context.drawImage(this.image, this.x, this.y, this.width, this.height);
-            }
-
-            update(){
-                this.x -= this.speed;
-                //if shield goes off screen, delete
-                if(this.x < 0 - this.width) this.markedForDeletion = true;
-            }
+    //generate shield items
+    class ShieldItem {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 33;
+            this.height = 25;
+            this.image = document.getElementById("shieldImage");
+            this.x = this.gameWidth;
+            this.y = Math.random() * (this.gameHeight - this.height);
+            this.speed = 4;
+            this.markedForDeletion = false;
         }
 
-        //add, animate, and remove shield items
-        function handleShieldItem(deltaTime){
-            if(shieldTimer > randomShieldInterval) {
-                shields.push(new ShieldItem(canvas.width, canvas.height));
-                shieldTimer = 0;
-                randomShieldInterval = Math.random()*120000;
-            } else {
-                shieldTimer += deltaTime;
-            }
-            shields.forEach(shield => {
-                shield.draw(ctx);
-                shield.update();
-            });
-            //remove gone/equipped shields from array
-            shields = shields.filter(shield => !shield.markedForDeletion);
+        draw(context) {
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
+
+        update() {
+            this.x -= this.speed;
+            //if shield goes off screen, delete
+            if (this.x < 0 - this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //add, animate, and remove shield items
+    function handleShieldItem(deltaTime) {
+        if (shieldTimer > randomShieldInterval) {
+            shields.push(new ShieldItem(canvas.width, canvas.height));
+            shieldTimer = 0;
+            randomShieldInterval = Math.random() * 120000;
+        } else {
+            shieldTimer += deltaTime;
+        }
+        shields.forEach(shield => {
+            shield.draw(ctx);
+            shield.update();
+        });
+        //remove gone/equipped shields from array
+        shields = shields.filter(shield => !shield.markedForDeletion);
+    }
 
     //display score and game over message
     function displayStatusText(context){
