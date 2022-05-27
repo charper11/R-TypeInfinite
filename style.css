@@ -15,6 +15,6 @@ body {
     border: 5px solid white;
 }
 
-#playerImage, #enemyImage {
+#playerImage, #enemyImage, #playerLaserImage {
     display: none;
 }

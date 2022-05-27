@@ -5,6 +5,7 @@ window.addEventListener('load', function(){
     canvas.width = 900;
     canvas.height = 550;
     let enemies = [];
+    let playerLasers = [];
     let score = 0;
     let gameOver = false;
 
@@ -17,7 +18,8 @@ window.addEventListener('load', function(){
                 if ((   e.key === 'ArrowDown' ||
                         e.key === 'ArrowUp' ||
                         e.key === 'ArrowLeft' ||
-                        e.key === 'ArrowRight')
+                        e.key === 'ArrowRight' ||
+                        e.key === 'Control')
                         && this.keys.indexOf(e.key) === -1){
                     this.keys.push(e.key);
                 }
@@ -27,7 +29,8 @@ window.addEventListener('load', function(){
                 if (    e.key === 'ArrowDown'  ||
                         e.key === 'ArrowUp' ||
                         e.key === 'ArrowLeft' ||
-                        e.key === 'ArrowRight'){
+                        e.key === 'ArrowRight' ||
+                        e.key === 'Control'){
                     this.keys.splice(this.keys.indexOf(e.key), 1);
                 }
             });
@@ -86,6 +89,46 @@ window.addEventListener('load', function(){
                    }
             });
         }
+    }
+
+    // generate player laser blasts
+    class PlayerLaser {
+        constructor(gameWidth, gameHeight, x, y){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 107;
+            this.height = 115;
+            this.image = document.getElementById("playerLaserImage");
+            this.x = x;
+            this.y = y;
+            this.speed = 12;
+            this.markedForDeletion = false;
+        }
+
+        draw(context){
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update(){
+            this.x += this.speed;
+            if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //add, animate, and remove player laser
+    function handlePlayerLaser(input, x, y, deltaTime){
+        if(input.keys.indexOf('Control') > -1 && laserTimer > laserInterval) {
+            playerLasers.push(new PlayerLaser(canvas.width, canvas.height, x, y));
+            laserTimer = 0;
+        } else {
+            laserTimer += deltaTime;
+        }
+        playerLasers.forEach(laser => {
+            laser.draw(ctx);
+            laser.update();
+        });
+        //remove gone/collided lasers from array
+        playerLasers = playerLasers.filter(laser => !laser.markedForDeletion);
     }
 
     //endlessly scrolling background
@@ -163,6 +206,9 @@ window.addEventListener('load', function(){
     let randomEnemyInterval = Math.random()*1000;
     //helper var for score
     let scoreTime = 0;
+    //helper for player laser
+    let laserTimer = 0;
+    let laserInterval = 100;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
@@ -172,6 +218,7 @@ window.addEventListener('load', function(){
         player.draw(ctx);
         player.update(input, enemies);
         handleEnemies(deltaTime);
+        handlePlayerLaser(input, player.x, player.y, deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx);
         if(!gameOver) requestAnimationFrame(animate);
