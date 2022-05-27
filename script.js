@@ -46,8 +46,6 @@ window.addEventListener('load', function(){
             this.ySpeed = 0;
         }
         draw(context){
-            context.fillStyle = 'white';
-            context.fillRect(this.x, this.y, this.width, this.height);
             context.drawImage(this.image, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(input){
@@ -94,6 +92,7 @@ window.addEventListener('load', function(){
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height);
             this.speed = 8;
+            this.markedForDeletion = false;
         }
 
         draw(context){
@@ -102,6 +101,7 @@ window.addEventListener('load', function(){
 
         update(){
             this.x -= this.speed;
+            if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
     }
 
@@ -118,6 +118,7 @@ window.addEventListener('load', function(){
             enemy.draw(ctx);
             enemy.update();
         });
+        enemies = enemies.filter(enemy => !enemy.markedForDeletion);
     }
 
     //display score and game over message
