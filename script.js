@@ -50,7 +50,7 @@ window.addEventListener('load', function(){
         draw(context){
             context.drawImage(this.image, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
-        update(input){
+        update(input, enemies){
             const PLAYER_SPEED = 7;
             // horizontal movement
             this.x += this.xSpeed;
@@ -75,6 +75,16 @@ window.addEventListener('load', function(){
             }
             if(this.y < 0) this.y = 0;
             else if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height;
+
+            //detect collision
+            enemies.forEach(enemy => {
+                if(player.x < enemy.x + enemy.width &&
+                   player.x + player.width > enemy.x &&
+                   player.y < enemy.y + enemy.height &&
+                   player.y + player.height > enemy.y){
+                       gameOver = true;
+                   }
+            });
         }
     }
 
@@ -160,7 +170,7 @@ window.addEventListener('load', function(){
         lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
         player.draw(ctx);
-        player.update(input);
+        player.update(input, enemies);
         handleEnemies(deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx);
