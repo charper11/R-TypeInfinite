@@ -252,7 +252,11 @@ window.addEventListener('load', function(){
                 this.y < player.y + player.height &&
                 this.y + this.height > player.y){
                     this.markedForDeletion = true;
-                    if(equippedShields.length === 0) equippedShields.push(new ShieldEquipped(player.x, player.y));
+                    if(equippedShields.length === 0) {
+                        equippedShields.push(new ShieldEquipped(player.x, player.y, true));
+                    } else if(equippedShields.length === 1) {
+                        equippedShields.push(new ShieldEquipped(player.x, player.y, false));
+                    }
                 }
 
             //if shield goes off screen, delete
@@ -279,13 +283,14 @@ window.addEventListener('load', function(){
 
     //generate equipped shield
     class ShieldEquipped {
-        constructor(x, y) {
+        constructor(x, y, isTop) {
             this.width = 33;
             this.height = 25;
             this.image = document.getElementById("shieldImage");
             this.x = x;
-            this.y = y-50;
+            this.y = y;
             this.markedForDeletion = false;
+            this.isTop = isTop;
         }
 
         draw(context) {
@@ -294,7 +299,7 @@ window.addEventListener('load', function(){
 
         update(x, y) {
             this.x = x;
-            this.y = y-50;
+            this.y = this.isTop ? y-50 : y+50;
 
             //detect collision
             enemies.forEach(enemy => {
