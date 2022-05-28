@@ -1,9 +1,15 @@
 window.addEventListener('load', function(){
-    const canvas = document.getElementById('canvas1');
+    const canvas = document.getElementById('gamePlayCanvas');
     // ctx = instance of built-in canvas 2D api that holds all drawing methods/properties
     const ctx = canvas.getContext('2d');
     canvas.width = 900;
     canvas.height = 550;
+
+    const gameBarCanvas = document.getElementById('gameBarCanvas');
+    const barCtx = gameBarCanvas.getContext('2d');
+    gameBarCanvas.width = 900;
+    gameBarCanvas.height = 50;
+
     let enemies = [];
     let playerLasers = [];
     let stars = [];
@@ -325,14 +331,17 @@ window.addEventListener('load', function(){
     }
 
     //display score and game over message
-    function displayStatusText(context){
-        context.fillStyle = 'white';
-        context.font = '20px Orbitron';
-        context.fillText('Score: ' + score, 20, 50);
+    function displayStatusText(gameContext, barContext){
+        barContext.fillStyle = 'white';
+        barContext.font = '20px Orbitron';
+        barContext.fillText('Score: ' + score, 20, 30);
+        barContext.fillText('Hi:' + localStorage.getItem('hiScore'), 300, 30);
         if(gameOver){
-            context.textAlign = 'center';
-            context.fillText('GAME OVER', canvas.width/2, canvas.height/2);
-            context.fillText('Press SPACE to play again', canvas.width/2, canvas.height/2+100);
+            gameContext.fillStyle = 'white';
+            gameContext.font = '20px Orbitron';
+            gameContext.textAlign = 'center';
+            gameContext.fillText('GAME OVER', canvas.width/2, canvas.height/2);
+            gameContext.fillText('Press SPACE to play again', canvas.width/2, canvas.height/2+100);
         }
     }
 
@@ -343,6 +352,7 @@ window.addEventListener('load', function(){
         } else {
             scoreTime += deltaTime;
         }
+        if(score > localStorage.getItem('hiScore')) localStorage.setItem('hiScore', score);
     }
 
     const input = new InputHandler();
@@ -366,6 +376,7 @@ window.addEventListener('load', function(){
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
+        barCtx.clearRect(0,0,gameBarCanvas.width, gameBarCanvas.height);
         background();
         player.draw(ctx);
         player.update(input);
@@ -374,7 +385,7 @@ window.addEventListener('load', function(){
         handleShieldItem(deltaTime);
         handleShieldEquipped(player.x, player.y);
         updateScore(deltaTime);
-        displayStatusText(ctx);
+        displayStatusText(ctx, barCtx);
         if(!gameOver) requestAnimationFrame(animate);
     }
     animate(0);

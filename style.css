@@ -7,12 +7,20 @@ body {
     background: black;
 }
 
-#canvas1 {
+#gamePlayCanvas {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     border: 5px solid white;
+}
+
+#gameBarCanvas {
+    position: absolute;
+    left: 50%;
+    top: 92%;
+    transform: translate(-50%, -50%);
+    border: 5px solid red;
 }
 
 #playerImage, #enemyImage, #playerLaserImage, #shieldImage {
