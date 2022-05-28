@@ -178,7 +178,7 @@ window.addEventListener('load', function(){
     function handlePlayerLaser(input, x, y, deltaTime){
         if(input.keys.indexOf('Control') > -1) {
             if(laserTimer > laserInterval) {
-                beamPower++;
+                if(beamPower < 10) beamPower++;
                 laserTimer = 0;
             } else {
                 laserTimer += deltaTime;
