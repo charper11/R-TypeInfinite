@@ -12,6 +12,7 @@ window.addEventListener('load', function(){
 
     let enemies = [];
     let playerLasers = [];
+    let beamPower = 0;
     let stars = [];
     let shields = [];
     let equippedShields = [];
@@ -175,9 +176,17 @@ window.addEventListener('load', function(){
 
     //add, animate, and remove player laser
     function handlePlayerLaser(input, x, y, deltaTime){
-        if(input.keys.indexOf('Control') > -1 && laserTimer > laserInterval) {
+        if(input.keys.indexOf('Control') > -1) {
+            if(laserTimer > laserInterval) {
+                beamPower++;
+                laserTimer = 0;
+            } else {
+                laserTimer += deltaTime;
+            }
+        } else if(beamPower) {
             playerLasers.push(new PlayerLaser(canvas.width, canvas.height, x, y));
             laserTimer = 0;
+            beamPower = 0;
         } else {
             laserTimer += deltaTime;
         }
@@ -334,8 +343,9 @@ window.addEventListener('load', function(){
     function displayStatusText(gameContext, barContext){
         barContext.fillStyle = 'white';
         barContext.font = '20px Orbitron';
+        barContext.fillText('Beam ' + beamPower, 200, 15);
         barContext.fillText('Score: ' + score, 20, 30);
-        barContext.fillText('Hi:' + localStorage.getItem('hiScore'), 300, 30);
+        barContext.fillText('Hi: ' + localStorage.getItem('hiScore'), 300, 30);
         if(gameOver){
             gameContext.fillStyle = 'white';
             gameContext.font = '20px Orbitron';
