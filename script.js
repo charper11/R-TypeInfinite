@@ -16,6 +16,8 @@ window.addEventListener('load', function(){
     let stars = [];
     let shields = [];
     let equippedShields = [];
+    let force = [];
+    let equippedForce = [];
     let score = 0;
     let gameOver = false;
 
@@ -339,6 +341,102 @@ window.addEventListener('load', function(){
         equippedShields = equippedShields.filter(shield => !shield.markedForDeletion);
     }
 
+    //generate force items
+    class ForceItem {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 63;
+            this.height = 53;
+            this.image = document.getElementById("forceImage");
+            this.x = 0;
+            this.y = Math.random() * (this.gameHeight - this.height);
+            this.speed = -4;
+            this.markedForDeletion = false;
+        }
+
+        draw(context) {
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update() {
+            this.x -= this.speed;
+
+            // if player collides with force item, remove it and add equipped force object
+            if(this.x < player.x + player.width &&
+                this.x + this.width > player.x &&
+                this.y < player.y + player.height &&
+                this.y + this.height > player.y){
+                    this.markedForDeletion = true;
+                    if(equippedForce.length === 0) {
+                        equippedForce.push(new ForceEquipped(player.x, player.y));
+                    }
+                }
+
+            //if force goes off screen, delete
+            if (this.x > this.gameWidth + this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //add, animate, and remove force items
+    function handleForceItem(deltaTime) {
+        if (forceTimer > randomForceInterval) {
+            force.push(new ForceItem(canvas.width, canvas.height));
+            forceTimer = 0;
+            randomForceInterval = (Math.random() * 120000) + 300000;
+        } else {
+            forceTimer += deltaTime;
+        }
+        force.forEach(f => {
+            f.draw(ctx);
+            f.update();
+        });
+        //remove gone/equipped force items from array
+        force = force.filter(f => !f.markedForDeletion);
+    }
+
+    //generate equipped force
+    class ForceEquipped {
+        constructor(x, y) {
+            this.width = 63;
+            this.height = 53;
+            this.image = document.getElementById("forceImage");
+            this.x = x+33;
+            this.y = y;
+            this.markedForDeletion = false;
+        }
+
+        draw(context) {
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update(x, y) {
+            this.x = x+63;
+            this.y = y;
+
+            //detect collision
+            enemies.forEach(enemy => {
+                if(this.x < enemy.x + enemy.width &&
+                   this.x + this.width > enemy.x &&
+                   this.y < enemy.y + enemy.height &&
+                   this.y + this.height > enemy.y){
+                    enemy.markedForDeletion = true;
+                    score += 10;
+                   }
+            });
+        }
+    }
+
+    //add, animate, and remove equipped force
+    function handleForceEquipped(x, y) {
+        equippedForce.forEach(f => {
+            f.draw(ctx);
+            f.update(x, y);
+        });
+        //remove unequipped force from array
+        equippedForce = equippedForce.filter(f => !f.markedForDeletion);
+    }
+
     //display score and game over message
     function displayStatusText(gameContext, barContext){
         displayBeamStatus(barContext);
@@ -389,6 +487,9 @@ window.addEventListener('load', function(){
     //helper for generating shield item
     let shieldTimer = 0;
     let randomShieldInterval = Math.random()*120000;
+    //helper for generating force item
+    let forceTimer = 0;
+    let randomForceInterval = Math.random()*120000;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
@@ -403,6 +504,8 @@ window.addEventListener('load', function(){
         handleEnemies(deltaTime);
         handleShieldItem(deltaTime);
         handleShieldEquipped(player.x, player.y);
+        handleForceItem(deltaTime);
+        handleForceEquipped(player.x, player.y);
         updateScore(deltaTime);
         displayStatusText(ctx, barCtx);
         if(!gameOver) requestAnimationFrame(animate);
