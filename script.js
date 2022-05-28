@@ -12,6 +12,42 @@ window.addEventListener('load', function(){
     let score = 0;
     let gameOver = false;
 
+    //star object for background
+    class Star {
+        constructor(gameWidth, gameHeight) {
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 1;
+            this.height = 1;
+            this.x = this.gameWidth;
+            this.y = Math.random() * (this.gameHeight - this.height);
+            this.speed = 4;
+            this.markedForDeletion = false;
+        }
+
+        draw(context) {
+            context.fillStyle = 'white';
+            context.fillRect(this.x, this.y, this.width, this.height);
+        }
+
+        update() {
+            this.x -= this.speed;
+            //if star goes off screen, delete
+            if (this.x < 0 - this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //endlessly scrolling background
+    function background() {
+        stars.push(new Star(canvas.width, canvas.height));
+        stars.forEach(star => {
+            star.draw(ctx);
+            star.update();
+        });
+        //remove stars from array
+        stars = stars.filter(star => !star.markedForDeletion);
+    }
+
     //apply event listeners to keyboard events and hold array of all currently active keys
     class InputHandler {
         constructor(){
@@ -145,42 +181,6 @@ window.addEventListener('load', function(){
         });
         //remove gone/collided lasers from array
         playerLasers = playerLasers.filter(laser => !laser.markedForDeletion);
-    }
-
-    //star object for background
-    class Star {
-        constructor(gameWidth, gameHeight){
-            this.gameWidth = gameWidth;
-            this.gameHeight = gameHeight;
-            this.width = 1;
-            this.height = 1;
-            this.x = this.gameWidth;
-            this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = 4;
-            this.markedForDeletion = false;
-        }
-
-        draw(context){
-            context.fillStyle = 'white';
-            context.fillRect(this.x, this.y, this.width, this.height);
-        }
-
-        update(){
-            this.x -= this.speed;
-            //if star goes off screen, delete
-            if(this.x < 0 - this.width) this.markedForDeletion = true;
-        }
-    }
-
-    //endlessly scrolling background
-    function background(){
-        stars.push(new Star(canvas.width, canvas.height));
-        stars.forEach(star => {
-            star.draw(ctx);
-            star.update();
-        });
-        //remove stars from array
-        stars = stars.filter(star => !star.markedForDeletion);
     }
 
     //generate enemies
