@@ -341,11 +341,12 @@ window.addEventListener('load', function(){
 
     //display score and game over message
     function displayStatusText(gameContext, barContext){
+        displayBeamStatus(barContext);
         barContext.fillStyle = 'white';
         barContext.font = '20px Orbitron';
-        barContext.fillText('Beam ' + beamPower, 200, 15);
+        barContext.fillText('Beam ', 200, 20);
         barContext.fillText('Score: ' + score, 20, 30);
-        barContext.fillText('Hi: ' + localStorage.getItem('hiScore'), 300, 30);
+        barContext.fillText('Hi: ' + localStorage.getItem('hiScore'), 500, 30);
         if(gameOver){
             gameContext.fillStyle = 'white';
             gameContext.font = '20px Orbitron';
@@ -353,6 +354,14 @@ window.addEventListener('load', function(){
             gameContext.fillText('GAME OVER', canvas.width/2, canvas.height/2);
             gameContext.fillText('Press SPACE to play again', canvas.width/2, canvas.height/2+100);
         }
+    }
+
+    //beam icon
+    function displayBeamStatus(barContext){
+        barContext.fillStyle = "blue";
+        barContext.fillRect(300, 5, 10*beamPower, 15);
+        barContext.strokeStyle = "white";
+        barContext.strokeRect(300, 5, 100, 15);
     }
 
     function updateScore(deltaTime){
