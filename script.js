@@ -92,7 +92,9 @@ window.addEventListener('load', function(){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 65;
-            this.height = 25;
+            this.height = 30;
+            this.frameX = 2;
+            this.frameWait = 0;
             this.x = 0;
             this.y = gameHeight/2 - this.height;
             this.image = document.getElementById('playerImage');
@@ -100,10 +102,14 @@ window.addEventListener('load', function(){
             this.ySpeed = 0;
         }
         draw(context){
-            context.drawImage(this.image, 0, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.stroke();
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
         update(input){
-            const PLAYER_SPEED = 7;
+            const PLAYER_SPEED = 3.5;
             // horizontal movement
             this.x += this.xSpeed;
             if(input.keys.indexOf('ArrowRight') > -1){
@@ -120,10 +126,46 @@ window.addEventListener('load', function(){
             this.y += this.ySpeed;
             if(input.keys.indexOf('ArrowUp') > -1){
                 this.ySpeed = -PLAYER_SPEED;
+                //change sprite: if spriteX is at pos < 4 move up
+                //wait to go from 3 to 4
+                if(this.frameX < 4){
+                    if(this.frameX === 3 && this.frameWait < 10){
+                        this.frameWait++;
+                    } else {
+                        this.frameX++;
+                        this.frameWait = 0;
+                    }
+                }
             } else if(input.keys.indexOf('ArrowDown') > -1){
                 this.ySpeed = PLAYER_SPEED;
+                //change sprite: if spriteX is at pos > 0 move down
+                //wait to go from 1 to 0
+                if(this.frameX > 0){
+                    if(this.frameX === 1 && this.frameWait < 10){
+                        this.frameWait++;
+                    } else {
+                        this.frameX--;
+                        this.frameWait = 0;
+                    }
+                }
             } else {
                 this.ySpeed = 0;
+                //change sprite: if spriteX is at pos 0, 1, 3, 4, move up/down by 1
+                if(this.frameX < 2) {
+                    if(this.frameX === 1 && this.frameWait < 10){
+                        this.frameWait++;
+                    } else {
+                        this.frameX++;
+                        this.frameWait = 0;
+                    }
+                } else if(this.frameX > 2) {
+                    if(this.frameX === 3 && this.frameWait < 10){
+                        this.frameWait++;
+                    } else {
+                        this.frameX--;
+                        this.frameWait = 0;
+                    }
+                }
             }
             if(this.y < 0) this.y = 0;
             else if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height;
@@ -230,7 +272,7 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("enemyImage");
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = 8;
+            this.speed = 4;
             this.markedForDeletion = false;
         }
 
