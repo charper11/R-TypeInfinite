@@ -2,8 +2,8 @@ window.addEventListener('load', function(){
     const canvas = document.getElementById('gamePlayCanvas');
     // ctx = instance of built-in canvas 2D api that holds all drawing methods/properties
     const ctx = canvas.getContext('2d');
-    canvas.width = 900;
-    canvas.height = 550;
+    canvas.width = 705;
+    canvas.height = 490;
 
     const gameBarCanvas = document.getElementById('gameBarCanvas');
     const barCtx = gameBarCanvas.getContext('2d');
