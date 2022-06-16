@@ -23,6 +23,6 @@ body {
     border: 5px solid red;
 }
 
-#playerImage, #enemyImage, #playerLaserImage, #shieldImage, #forceImage, #largeShipImage {
+#playerImage, #enemyImage, #playerBeamImage, #shieldImage, #forceImage, #largeShipImage {
     display: none;
 }

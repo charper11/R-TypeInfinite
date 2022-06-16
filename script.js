@@ -11,7 +11,7 @@ window.addEventListener('load', function(){
     gameBarCanvas.height = 50;
 
     let enemies = [];
-    let playerLasers = [];
+    let playerBeams = [];
     let beamPower = 0;
     let stars = [];
     let shields = [];
@@ -68,7 +68,7 @@ window.addEventListener('load', function(){
                         e.key === 'ArrowUp' ||
                         e.key === 'ArrowLeft' ||
                         e.key === 'ArrowRight' ||
-                        e.key === 'Control')
+                        e.key === 's')
                         && this.keys.indexOf(e.key) === -1){
                     this.keys.push(e.key);
                 }
@@ -79,7 +79,7 @@ window.addEventListener('load', function(){
                         e.key === 'ArrowUp' ||
                         e.key === 'ArrowLeft' ||
                         e.key === 'ArrowRight' ||
-                        e.key === 'Control'){
+                        e.key === 's'){
                     this.keys.splice(this.keys.indexOf(e.key), 1);
                 }
             });
@@ -192,17 +192,17 @@ window.addEventListener('load', function(){
         }
     }
 
-    // generate player laser blasts
-    class PlayerLaser {
+    // generate player beam blasts
+    class PlayerBeam {
         constructor(gameWidth, gameHeight, x, y){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 33;
-            this.height = 9;
-            this.image = document.getElementById("playerLaserImage");
+            this.width = 32;
+            this.height = 8;
+            this.image = document.getElementById("playerBeamImage");
             this.x = x;
             this.y = y;
-            this.speed = 12;
+            this.speed = 25;
             this.markedForDeletion = false;
         }
 
@@ -212,7 +212,7 @@ window.addEventListener('load', function(){
 
         update(){
             this.x += this.speed;
-            //remove laser from array if offscreen
+            //remove beam from array if offscreen
             if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
 
             //detect collision with enemy
@@ -238,28 +238,28 @@ window.addEventListener('load', function(){
         }
     }
 
-    //add, animate, and remove player laser
-    function handlePlayerLaser(input, x, y, deltaTime){
-        if(input.keys.indexOf('Control') > -1) {
-            if(laserTimer > laserInterval) {
+    //add, animate, and remove player beam
+    function handlePlayerBeam(input, x, y, deltaTime){
+        if(input.keys.indexOf('s') > -1) {
+            if(beamTimer > beamInterval) {
                 if(beamPower < 10) beamPower++;
-                laserTimer = 0;
+                beamTimer = 0;
             } else {
-                laserTimer += deltaTime;
+                beamTimer += deltaTime;
             }
         } else if(beamPower) {
-            playerLasers.push(new PlayerLaser(canvas.width, canvas.height, x, y));
-            laserTimer = 0;
+            playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y));
+            beamTimer = 0;
             beamPower = 0;
         } else {
-            laserTimer += deltaTime;
+            beamTimer += deltaTime;
         }
-        playerLasers.forEach(laser => {
-            laser.draw(ctx);
-            laser.update();
+        playerBeams.forEach(beam => {
+            beam.draw(ctx);
+            beam.update();
         });
-        //remove gone/collided lasers from array
-        playerLasers = playerLasers.filter(laser => !laser.markedForDeletion);
+        //remove gone/collided beams from array
+        playerBeams = playerBeams.filter(beam => !beam.markedForDeletion);
     }
 
     //generate enemies
@@ -597,9 +597,9 @@ window.addEventListener('load', function(){
     let randomEnemyInterval = Math.random()*1000;
     //helper var for score
     let scoreTime = 0;
-    //helper for player laser
-    let laserTimer = 0;
-    let laserInterval = 100;
+    //helper for player beam
+    let beamTimer = 0;
+    let beamInterval = 100;
     //helper for generating shield item
     let shieldTimer = 0;
     let randomShieldInterval = Math.random()*120000;
@@ -619,7 +619,7 @@ window.addEventListener('load', function(){
         background();
         player.draw(ctx);
         player.update(input);
-        handlePlayerLaser(input, player.x, player.y, deltaTime);
+        handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
         handleEnemies(deltaTime);
         handleShieldItem(deltaTime);
         handleShieldEquipped(player.x, player.y);
