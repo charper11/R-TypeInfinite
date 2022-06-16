@@ -267,16 +267,20 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 107;
-            this.height = 115;
+            this.width = 42;
+            this.height = 48;
             this.image = document.getElementById("enemyImage");
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = 4;
+            this.speed = 3;
             this.markedForDeletion = false;
         }
 
         draw(context){
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.stroke();
             context.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
 
