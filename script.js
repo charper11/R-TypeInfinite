@@ -22,6 +22,25 @@ window.addEventListener('load', function(){
     let score = 0;
     let gameOver = false;
 
+    //detect collision of two ellipsoids
+    function collisionDetection(X1, Y1, W1, H1, X2, Y2, W2, H2) {
+
+        const EllipsoidRadius = (w, h, direction) => {
+            direction = [direction[0] / w, direction[1] / h];
+            let m = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
+            if (m > 0) direction = [direction[0] / m, direction[1] / m];
+            direction = [direction[0] * w, direction[1] * h];
+            return Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
+        }
+
+        let direction = [X1 - X2, Y1 - Y2];
+        let distance = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
+
+        let radius1 = EllipsoidRadius(W1, H1, direction);
+        let radius2 = EllipsoidRadius(W2, H2, direction);
+        return distance < radius1 + radius2;
+    }
+
     //star object for background
     class Star {
         constructor(gameWidth, gameHeight) {
@@ -172,12 +191,16 @@ window.addEventListener('load', function(){
 
             //detect enemy collision
             enemies.forEach(enemy => {
-                if(this.x < enemy.x + enemy.width &&
-                   this.x + this.width > enemy.x &&
-                   this.y < enemy.y + enemy.height &&
-                   this.y + this.height > enemy.y){
-                       gameOver = true;
-                   }
+                if (collisionDetection(this.x + this.width/2,
+                                       this.y + this.height/2,
+                                       this.width/2,
+                                       this.height/2,
+                                       enemy.x + enemy.width/2,
+                                       enemy.y + enemy.height/2,
+                                       enemy.width/2,
+                                       enemy.height/2)) {
+                    gameOver = true;
+                }
             });
 
             //detect large ship collision
@@ -215,16 +238,20 @@ window.addEventListener('load', function(){
             //remove beam from array if offscreen
             if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
 
-            //detect collision with enemy
+            //detect enemy collision
             enemies.forEach(enemy => {
-                if(this.x < enemy.x + enemy.width &&
-                   this.x + this.width > enemy.x &&
-                   this.y < enemy.y + enemy.height &&
-                   this.y + this.height > enemy.y){
+                if (collisionDetection(this.x + this.width/2,
+                                       this.y + this.height/2,
+                                       this.width/2,
+                                       this.height/2,
+                                       enemy.x + enemy.width/2,
+                                       enemy.y + enemy.height/2,
+                                       enemy.width/2,
+                                       enemy.height/2)) {
                     this.markedForDeletion = true;
                     enemy.markedForDeletion = true;
                     score += 10;
-                   }
+                }
             });
             //detect collision with large ship
             largeShip.forEach(ship => {
