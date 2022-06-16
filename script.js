@@ -313,8 +313,9 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 33;
-            this.height = 25;
+            this.width = 36;
+            this.height = 33;
+            this.frameX = 0;
             this.image = document.getElementById("shieldImage");
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height);
@@ -323,7 +324,7 @@ window.addEventListener('load', function(){
         }
 
         draw(context) {
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
         update() {
@@ -371,22 +372,66 @@ window.addEventListener('load', function(){
     //generate equipped shield
     class ShieldEquipped {
         constructor(x, y, isTop) {
-            this.width = 33;
-            this.height = 25;
+            this.width = 36;
+            this.height = 33;
             this.image = document.getElementById("shieldImage");
+            this.frameX = 0;
+            this.maxFrame = 11;
+            this.frameTimer = 0;
+            this.frameInterval = 1000/20;
             this.x = x;
             this.y = y;
+            this.lagTimer = 0;
+            this.lagInterval = 1000/60;
+            this.xQueue = [];
+            this.yQueue = [];
             this.markedForDeletion = false;
             this.isTop = isTop;
         }
 
         draw(context) {
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.arc(this.x + 36/2, this.y + this.height/2, 36/2, 0, Math.PI*2);
+            context.stroke();
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
-        update(x, y) {
-            this.x = x;
-            this.y = this.isTop ? y-50 : y+50;
+        update(x, y, deltaTime) {
+            //handle location
+            if(this.xQueue.length === 0) {
+                this.x = x + 10;
+                this.y = this.isTop ? y-50 : y+50;
+            }
+            this.xQueue.push(x);
+            if(this.xQueue.length > 10) this.xQueue.shift();
+            this.yQueue.push(y);
+            if(this.yQueue.length > 10) this.yQueue.shift();
+
+            if(this.lagTimer > this.lagInterval) {
+                this.x = this.xQueue.shift() + 10;
+                this.y = this.isTop ? this.yQueue.shift()-50 : this.yQueue.shift()+50;
+                this.lagTimer = 0;
+            } else {
+                this.lagTimer += deltaTime;
+            }
+
+            //handle sprite
+            if(this.frameTimer > this.frameInterval){
+                if(this.frameX >= this.maxFrame) this.frameX = 0;
+                else this.frameX++;
+                this.frameTimer = 0;
+                if(this.frameX > 1 && this.frameX < 8){
+                    this.width = 38;
+                } else if(this.frameX >= 8 && this.frameX < 10){
+                    this.width = 38.3;
+                } else if(this.frameX >= 10) {
+                    this.width = 38.5;
+                }
+                else this.width = 36;
+            } else {
+                this.frameTimer += deltaTime;
+            }
 
             //detect collision
             enemies.forEach(enemy => {
@@ -402,10 +447,10 @@ window.addEventListener('load', function(){
     }
 
     //add, animate, and remove equipped shield
-    function handleShieldEquipped(x, y) {
+    function handleShieldEquipped(x, y, deltaTime) {
         equippedShields.forEach(shield => {
             shield.draw(ctx);
-            shield.update(x, y);
+            shield.update(x, y, deltaTime);
         });
         //remove unequipped shields from array
         equippedShields = equippedShields.filter(shield => !shield.markedForDeletion);
@@ -622,7 +667,7 @@ window.addEventListener('load', function(){
         handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
         handleEnemies(deltaTime);
         handleShieldItem(deltaTime);
-        handleShieldEquipped(player.x, player.y);
+        handleShieldEquipped(player.x, player.y, deltaTime);
         handleForceItem(deltaTime);
         handleForceEquipped(player.x, player.y);
         handleLargeShip(deltaTime);
