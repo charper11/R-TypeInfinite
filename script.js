@@ -461,17 +461,18 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 63;
-            this.height = 53;
+            this.width = 34;
+            this.height = 36;
             this.image = document.getElementById("forceImage");
+            this.frameX = 0;
             this.x = 0;
             this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = -4;
+            this.speed = -1;
             this.markedForDeletion = false;
         }
 
         draw(context) {
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
         update() {
@@ -517,21 +518,39 @@ window.addEventListener('load', function(){
     //generate equipped force
     class ForceEquipped {
         constructor(x, y) {
-            this.width = 63;
-            this.height = 53;
+            this.width = 36;
+            this.height = 36;
             this.image = document.getElementById("forceImage");
+            this.frameX = 0;
+            this.frameArray = [0, 68, 136, 196, 258, 324];
+            this.maxFrame = 5;
+            this.frameTimer = 0;
+            this.frameInterval = 1000/18;
             this.x = x+33;
             this.y = y;
             this.markedForDeletion = false;
         }
 
         draw(context) {
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.arc(this.x + 36/2, this.y + this.height/2, 36/2, 0, Math.PI*2);
+            context.stroke();
+            context.drawImage(this.image, this.frameArray[this.frameX], 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
-        update(x, y) {
-            this.x = x+63;
+        update(x, y, deltaTime) {
+            this.x = x+65;
             this.y = y;
+
+            //handle sprite
+            if(this.frameTimer > this.frameInterval) {
+                if(this.frameX >= this.maxFrame) this.frameX = 0;
+                else this.frameX ++;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
 
             //detect collision
             enemies.forEach(enemy => {
@@ -547,10 +566,10 @@ window.addEventListener('load', function(){
     }
 
     //add, animate, and remove equipped force
-    function handleForceEquipped(x, y) {
+    function handleForceEquipped(x, y, deltaTime) {
         equippedForce.forEach(f => {
             f.draw(ctx);
-            f.update(x, y);
+            f.update(x, y, deltaTime);
         });
         //remove unequipped force from array
         equippedForce = equippedForce.filter(f => !f.markedForDeletion);
@@ -669,7 +688,7 @@ window.addEventListener('load', function(){
         handleShieldItem(deltaTime);
         handleShieldEquipped(player.x, player.y, deltaTime);
         handleForceItem(deltaTime);
-        handleForceEquipped(player.x, player.y);
+        handleForceEquipped(player.x, player.y, deltaTime);
         handleLargeShip(deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx, barCtx);
