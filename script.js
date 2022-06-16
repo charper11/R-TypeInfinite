@@ -405,7 +405,7 @@ window.addEventListener('load', function(){
         update(x, y, deltaTime) {
             //handle location
             if(this.xQueue.length === 0) {
-                this.x = x + 10;
+                this.x = x + 15;
                 this.y = this.isTop ? y-50 : y+50;
             }
             this.xQueue.push(x);
@@ -414,7 +414,7 @@ window.addEventListener('load', function(){
             if(this.yQueue.length > 10) this.yQueue.shift();
 
             if(this.lagTimer > this.lagInterval) {
-                this.x = this.xQueue.shift() + 10;
+                this.x = this.xQueue.shift() + 15;
                 this.y = this.isTop ? this.yQueue.shift()-50 : this.yQueue.shift()+50;
                 this.lagTimer = 0;
             } else {
