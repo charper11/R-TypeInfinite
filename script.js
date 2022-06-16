@@ -23,7 +23,7 @@ window.addEventListener('load', function(){
     let gameOver = false;
 
     //detect collision of two ellipsoids
-    function collisionDetection(X1, Y1, W1, H1, X2, Y2, W2, H2) {
+    function collisionDetection(X1, Y1, W1, H1, X2, Y2, W2, H2, isCircle1, isCircle2) {
 
         const EllipsoidRadius = (w, h, direction) => {
             direction = [direction[0] / w, direction[1] / h];
@@ -36,8 +36,8 @@ window.addEventListener('load', function(){
         let direction = [X1 - X2, Y1 - Y2];
         let distance = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
 
-        let radius1 = EllipsoidRadius(W1, H1, direction);
-        let radius2 = EllipsoidRadius(W2, H2, direction);
+        let radius1 = isCircle1 ? W1 : EllipsoidRadius(W1, H1, direction);
+        let radius2 = isCircle2 ? W2 : EllipsoidRadius(W2, H2, direction);
         return distance < radius1 + radius2;
     }
 
@@ -198,7 +198,9 @@ window.addEventListener('load', function(){
                                        enemy.x + enemy.width/2,
                                        enemy.y + enemy.height/2,
                                        enemy.width/2,
-                                       enemy.height/2)) {
+                                       enemy.height/2,
+                                       false,
+                                       false)) {
                     gameOver = true;
                 }
             });
@@ -247,7 +249,9 @@ window.addEventListener('load', function(){
                                        enemy.x + enemy.width/2,
                                        enemy.y + enemy.height/2,
                                        enemy.width/2,
-                                       enemy.height/2)) {
+                                       enemy.height/2,
+                                       false,
+                                       false)) {
                     this.markedForDeletion = true;
                     enemy.markedForDeletion = true;
                     score += 10;
@@ -457,15 +461,21 @@ window.addEventListener('load', function(){
                 this.frameTimer += deltaTime;
             }
 
-            //detect collision
+            //detect enemy collision
             enemies.forEach(enemy => {
-                if(this.x < enemy.x + enemy.width &&
-                   this.x + this.width > enemy.x &&
-                   this.y < enemy.y + enemy.height &&
-                   this.y + this.height > enemy.y){
+                if (collisionDetection(this.x + this.width/2,
+                                       this.y + this.height/2,
+                                       this.width/2,
+                                       this.height/2,
+                                       enemy.x + enemy.width/2,
+                                       enemy.y + enemy.height/2,
+                                       enemy.width/2,
+                                       enemy.height/2,
+                                       true,
+                                       false)) {
                     enemy.markedForDeletion = true;
                     score += 10;
-                   }
+                }
             });
         }
     }
@@ -576,15 +586,21 @@ window.addEventListener('load', function(){
                 this.frameTimer += deltaTime;
             }
 
-            //detect collision
+            //detect enemy collision
             enemies.forEach(enemy => {
-                if(this.x < enemy.x + enemy.width &&
-                   this.x + this.width > enemy.x &&
-                   this.y < enemy.y + enemy.height &&
-                   this.y + this.height > enemy.y){
+                if (collisionDetection(this.x + this.width / 2,
+                                       this.y + this.height / 2,
+                                       this.width / 2,
+                                       this.height / 2,
+                                       enemy.x + enemy.width / 2,
+                                       enemy.y + enemy.height / 2,
+                                       enemy.width / 2,
+                                       enemy.height / 2,
+                                       true,
+                                       false)) {
                     enemy.markedForDeletion = true;
                     score += 10;
-                   }
+                }
             });
         }
     }
