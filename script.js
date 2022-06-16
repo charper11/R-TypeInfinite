@@ -31,7 +31,7 @@ window.addEventListener('load', function(){
             this.height = 1;
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = 4;
+            this.speed = 1;
             this.markedForDeletion = false;
         }
 
@@ -313,8 +313,8 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 36;
-            this.height = 33;
+            this.width = 24;
+            this.height = 24;
             this.frameX = 0;
             this.image = document.getElementById("shieldImage");
             this.x = this.gameWidth;
@@ -372,10 +372,11 @@ window.addEventListener('load', function(){
     //generate equipped shield
     class ShieldEquipped {
         constructor(x, y, isTop) {
-            this.width = 36;
-            this.height = 33;
+            this.width = 24;
+            this.height = 24;
             this.image = document.getElementById("shieldImage");
             this.frameX = 0;
+            this.frameArray = [0, 44, 86, 130, 176, 222, 264, 304, 346, 386, 426, 470]
             this.maxFrame = 11;
             this.frameTimer = 0;
             this.frameInterval = 1000/20;
@@ -392,9 +393,9 @@ window.addEventListener('load', function(){
         draw(context) {
             context.strokeStyle = 'white';
             context.beginPath();
-            context.arc(this.x + 36/2, this.y + this.height/2, 36/2, 0, Math.PI*2);
+            context.arc(this.x + 12, this.y + this.height/2, 12, 0, Math.PI*2);
             context.stroke();
-            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.frameArray[this.frameX], 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
         update(x, y, deltaTime) {
@@ -421,14 +422,6 @@ window.addEventListener('load', function(){
                 if(this.frameX >= this.maxFrame) this.frameX = 0;
                 else this.frameX++;
                 this.frameTimer = 0;
-                if(this.frameX > 1 && this.frameX < 8){
-                    this.width = 38;
-                } else if(this.frameX >= 8 && this.frameX < 10){
-                    this.width = 38.3;
-                } else if(this.frameX >= 10) {
-                    this.width = 38.5;
-                }
-                else this.width = 36;
             } else {
                 this.frameTimer += deltaTime;
             }
