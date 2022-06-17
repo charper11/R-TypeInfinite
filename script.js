@@ -18,7 +18,7 @@ window.addEventListener('load', function(){
     let equippedShields = [];
     let force = [];
     let equippedForce = [];
-    let largeShip = [];
+    let wall = [];
     let score = 0;
     let gameOver = false;
 
@@ -205,12 +205,12 @@ window.addEventListener('load', function(){
                 }
             });
 
-            //detect large ship collision
-            largeShip.forEach(ship => {
-                if(this.x < ship.x + ship.width &&
-                   this.x + this.width > ship.x &&
-                   this.y < ship.y + ship.height &&
-                   this.y + this.height > ship.y){
+            //detect wall collision
+            wall.forEach(w => {
+                if(this.x < w.x + w.widthTotal &&
+                   this.x + this.width > w.x &&
+                   this.y < w.hitboxY + w.hitboxHeight &&
+                   this.y + this.height > w.hitboxY){
                        gameOver = true;
                    }
             });
@@ -257,12 +257,12 @@ window.addEventListener('load', function(){
                     score += 10;
                 }
             });
-            //detect collision with large ship
-            largeShip.forEach(ship => {
-                if(this.x < ship.x + ship.width &&
-                   this.x + this.width > ship.x &&
-                   this.y < ship.y + ship.height &&
-                   this.y + this.height > ship.y){
+            //detect collision with wall
+            wall.forEach(w => {
+                if(this.x < w.x + w.widthTotal &&
+                   this.x + this.width > w.x &&
+                   this.y < w.y + w.height &&
+                   this.y + this.height > w.y){
                     this.markedForDeletion = true;
                    }
             });
@@ -325,10 +325,10 @@ window.addEventListener('load', function(){
     //add, animate, and remove enemies
     function handleEnemies(deltaTime){
         if(enemyTimer > enemyInterval + randomEnemyInterval) {
-            if(largeShip.length === 0) {
+            if(wall.length === 0) {
                 enemies.push(new Enemy(canvas.width, canvas.height));
             } else {
-                enemies.push(new Enemy(canvas.width, canvas.height-largeShip[0].height));
+                enemies.push(new Enemy(canvas.width, canvas.height-wall[0].height));
             }
             enemyTimer = 0;
             randomEnemyInterval = Math.random()*1000;
@@ -386,10 +386,10 @@ window.addEventListener('load', function(){
     //add, animate, and remove shield items
     function handleShieldItem(deltaTime) {
         if (shieldTimer > randomShieldInterval) {
-            if(largeShip.length === 0){
+            if(wall.length === 0){
                 shields.push(new ShieldItem(canvas.width, canvas.height));
             } else {
-                shields.push(new ShieldItem(canvas.width, canvas.height-largeShip[0].height));
+                shields.push(new ShieldItem(canvas.width, canvas.height-wall[0].height));
             }
             shieldTimer = 0;
             randomShieldInterval = (Math.random() * 120000) + 120000;
@@ -531,10 +531,10 @@ window.addEventListener('load', function(){
     //add, animate, and remove force items
     function handleForceItem(deltaTime) {
         if (forceTimer > randomForceInterval) {
-            if(largeShip.length === 0){
+            if(wall.length === 0){
                 force.push(new ForceItem(canvas.width, canvas.height));
             } else {
-                force.push(new ForceItem(canvas.width, canvas.height-largeShip[0].height));
+                force.push(new ForceItem(canvas.width, canvas.height-wall[0].height));
             }
             forceTimer = 0;
             randomForceInterval = (Math.random() * 120000) + 300000;
@@ -615,46 +615,62 @@ window.addEventListener('load', function(){
         equippedForce = equippedForce.filter(f => !f.markedForDeletion);
     }
 
-    //generate large ship that moves across the bottom of screen
-    class LargeShip {
-        constructor(gameWidth, gameHeight){
+    //generate wall that moves across the bottom of screen
+    class Wall {
+        constructor(gameWidth, gameHeight, count){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 1845;
-            this.height = 330;
-            this.image = document.getElementById("largeShipImage");
+            this.count = count;
+            this.widthStart = 54;
+            this.widthMiddle = 70;
+            this.widthEnd = 46;
+            this.widthTotal = 100+(count*70);
+            this.height = 64;
+            this.hitboxHeight = 54;
+            this.imageStart = document.getElementById("wallStart");
+            this.imageMiddle = document.getElementById("wallMiddle");
+            this.imageEnd = document.getElementById("wallEnd");
             this.x = this.gameWidth;
             this.y = this.gameHeight - this.height;
+            this.hitboxY = this.gameHeight - this.hitboxHeight;
             this.speed = 2;
             this.markedForDeletion = false;
         }
 
         draw(context){
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.drawImage(this.imageStart, this.x, this.y, this.widthStart, this.height);
+            for(let i = 0; i < this.count; i++){
+                context.drawImage(this.imageMiddle, this.x+this.widthStart+(this.widthMiddle*i), this.y, this.widthMiddle, this.height);
+            }
+            context.drawImage(this.imageEnd, this.x+this.widthTotal-this.widthEnd, this.y, this.widthEnd, this.height);
+            context.strokeStyle = 'white';
+            context.strokeRect(this.x, this.hitboxY, this.widthTotal, this.hitboxHeight);
         }
 
         update(){
             this.x -= this.speed;
             //if ship goes off screen, delete
-            if(this.x < 0 - this.width) this.markedForDeletion = true;
+            if(this.x < 0 - this.widthTotal) this.markedForDeletion = true;
         }
     }
 
-    //add, animate, and remove large ship
-    function handleLargeShip(deltaTime){
-        if(largeShipTimer > largeShipInterval) {
-            largeShip.push(new LargeShip(canvas.width, canvas.height));
-            largeShipTimer = 0;
-            largeShipInterval = Math.random()*100000;
+    //add, animate, and remove wall
+    function handleWall(deltaTime){
+        if(wallTimer > wallInterval) {
+            //get size of wall
+            const count = (Math.random()*20)+10;
+            wall.push(new Wall(canvas.width, canvas.height, count));
+            wallTimer = 0;
+            wallInterval = Math.random()*100000;
         } else {
-            largeShipTimer += deltaTime;
+            if(wall.length === 0) wallTimer += deltaTime;
         }
-        largeShip.forEach(ship => {
-            ship.draw(ctx);
-            ship.update();
+        wall.forEach(w => {
+            w.draw(ctx);
+            w.update();
         });
-        //remove gone large ship from array
-        largeShip = largeShip.filter(ship => !ship.markedForDeletion);
+        //remove gone wall from array
+        wall = wall.filter(w => !w.markedForDeletion);
     }
 
     //display score and game over message
@@ -710,9 +726,9 @@ window.addEventListener('load', function(){
     //helper for generating force item
     let forceTimer = 0;
     let randomForceInterval = Math.random()*120000;
-    //helper for generating large ship
-    let largeShipTimer = 0;
-    let largeShipInterval = 10000;
+    //helper for generating wall
+    let wallTimer = 0;
+    let wallInterval = 10000;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
@@ -729,7 +745,7 @@ window.addEventListener('load', function(){
         handleShieldEquipped(player.x, player.y, deltaTime);
         handleForceItem(deltaTime);
         handleForceEquipped(player.x, player.y, deltaTime);
-        handleLargeShip(deltaTime);
+        handleWall(deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx, barCtx);
         if(!gameOver) requestAnimationFrame(animate);
