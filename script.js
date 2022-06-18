@@ -19,7 +19,8 @@ window.addEventListener('load', function(){
     let equippedShields = [];
     let force = [];
     let equippedForce = [];
-    let wall = [];
+    let topWall = [];
+    let bottomWall = [];
     let score = 0;
     let gameOver = false;
 
@@ -223,7 +224,15 @@ window.addEventListener('load', function(){
             });
 
             //detect wall collision
-            wall.forEach(w => {
+            bottomWall.forEach(w => {
+                if(this.x < w.x + w.widthTotal &&
+                   this.x + this.width > w.x &&
+                   this.y < w.hitboxY + w.hitboxHeight &&
+                   this.y + this.height > w.hitboxY){
+                       gameOver = true;
+                   }
+            });
+            topWall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
                    this.x + this.width > w.x &&
                    this.y < w.hitboxY + w.hitboxHeight &&
@@ -283,7 +292,15 @@ window.addEventListener('load', function(){
                 }
             });
             //detect collision with wall
-            wall.forEach(w => {
+            bottomWall.forEach(w => {
+                if(this.x < w.x + w.widthTotal &&
+                   this.x + this.width > w.x &&
+                   this.y < w.y + w.height &&
+                   this.y + this.height > w.y){
+                    this.markedForDeletion = true;
+                   }
+            });
+            topWall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
                    this.x + this.width > w.x &&
                    this.y < w.y + w.height &&
@@ -328,7 +345,7 @@ window.addEventListener('load', function(){
             this.height = 48;
             this.image = document.getElementById("enemyImage");
             this.x = this.gameWidth;
-            this.y = Math.random() * (this.gameHeight - this.height);
+            this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
             this.speed = 3;
             this.willFire = willFire;
             this.fireInterval = Math.random() * (this.gameWidth / this.speed);
@@ -372,10 +389,12 @@ window.addEventListener('load', function(){
         if(enemyTimer > enemyInterval + randomEnemyInterval) {
             // each enemy has a 25% of firing
             const willFire = Math.random() < 0.25;
-            if(wall.length === 0) {
+            if(bottomWall.length === 0 && topWall.length === 0) {
                 enemies.push(new Enemy(canvas.width, canvas.height, willFire));
+            } else if(bottomWall.length > 0 && topWall.length > 0) {
+                enemies.push(new Enemy(canvas.width, canvas.height-(bottomWall[0].height*2), willFire));
             } else {
-                enemies.push(new Enemy(canvas.width, canvas.height-wall[0].height, willFire));
+                enemies.push(new Enemy(canvas.width, canvas.height-64, willFire));
             }
             enemyTimer = 0;
             randomEnemyInterval = Math.random()*1000;
@@ -436,7 +455,7 @@ window.addEventListener('load', function(){
             }
 
             //detect collision with wall
-            wall.forEach(w => {
+            bottomWall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
                    this.x + this.width > w.x &&
                    this.y < w.y + w.height &&
@@ -467,7 +486,7 @@ window.addEventListener('load', function(){
             this.height = 61;
             this.image = document.getElementById("itemRobot");
             this.x = this.gameWidth;
-            this.y = Math.random() * (this.gameHeight - this.height);
+            this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
             this.speed = 3;
             this.markedForDeletion = false;
             this.willFire = false;
@@ -491,10 +510,12 @@ window.addEventListener('load', function(){
     //add, animate, and remove item robot
     function handleItemRobots(deltaTime){
         if(robotTimer > randomRobotInterval) {
-            if(wall.length === 0) {
+            if(bottomWall.length === 0 && topWall.length === 0) {
                 enemies.push(new ItemRobot(canvas.width, canvas.height));
+            } else if(bottomWall.length > 0 && topWall.length > 0) {
+                enemies.push(new ItemRobot(canvas.width, canvas.height-(bottomWall[0].height*2)));
             } else {
-                enemies.push(new ItemRobot(canvas.width, canvas.height-wall[0].height));
+                enemies.push(new ItemRobot(canvas.width, canvas.height-64));
             }
             robotTimer = 0;
         } else {
@@ -839,7 +860,7 @@ window.addEventListener('load', function(){
     }
 
     //generate wall that moves across the bottom of screen
-    class Wall {
+    class BottomWall {
         constructor(gameWidth, gameHeight, count){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
@@ -872,28 +893,59 @@ window.addEventListener('load', function(){
 
         update(){
             this.x -= this.speed;
-            //if ship goes off screen, delete
+            //if wall goes off screen, delete
             if(this.x < 0 - this.widthTotal) this.markedForDeletion = true;
         }
     }
 
-    //add, animate, and remove wall
-    function handleWall(deltaTime){
+    //add, animate, and remove bottom wall
+    function handleBottomWall(deltaTime){
         if(wallTimer > wallInterval) {
             //get size of wall
             const count = (Math.random()*20)+10;
-            wall.push(new Wall(canvas.width, canvas.height, count));
+            bottomWall.push(new BottomWall(canvas.width, canvas.height, count));
             wallTimer = 0;
             wallInterval = Math.random()*100000;
         } else {
-            if(wall.length === 0) wallTimer += deltaTime;
+            if(bottomWall.length === 0) wallTimer += deltaTime;
         }
-        wall.forEach(w => {
+        bottomWall.forEach(w => {
             w.draw(ctx);
             w.update();
         });
         //remove gone wall from array
-        wall = wall.filter(w => !w.markedForDeletion);
+        bottomWall = bottomWall.filter(w => !w.markedForDeletion);
+    }
+
+    //generate wall that moves across the top of screen
+    class TopWall extends BottomWall {
+        constructor(gameWidth, gameHeight, count){
+            super(gameWidth, gameHeight, count);
+            this.imageStart = document.getElementById("topWallStart");
+            this.imageMiddle = document.getElementById("topWallMiddle");
+            this.imageEnd = document.getElementById("topWallEnd");
+            this.y = 0;
+            this.hitboxY = 0;
+        }
+    }
+
+    //add, animate, and remove top wall
+    function handleTopWall(deltaTime){
+        if(topWallTimer > topWallInterval) {
+            //get size of wall
+            const count = (Math.random()*20)+10;
+            topWall.push(new TopWall(canvas.width, canvas.height, count));
+            topWallTimer = 0;
+            topWallInterval = Math.random()*100000;
+        } else {
+            if(topWall.length === 0) topWallTimer += deltaTime;
+        }
+        topWall.forEach(w => {
+            w.draw(ctx);
+            w.update();
+        });
+        //remove gone wall from array
+        topWall = topWall.filter(w => !w.markedForDeletion);
     }
 
     //display score and game over message
@@ -945,7 +997,9 @@ window.addEventListener('load', function(){
     let beamInterval = 100;
     //helper for generating wall
     let wallTimer = 0;
+    let topWallTimer = 0;
     let wallInterval = 10000;
+    let topWallInterval = 10000;
     // helper for item robot
     let robotTimer = 0;
     let randomRobotInterval = Math.random()*12000;
@@ -967,7 +1021,8 @@ window.addEventListener('load', function(){
         handleShieldEquipped(player.x, player.y, deltaTime);
         handleForceItem(deltaTime);
         handleForceEquipped(player.x, player.y, deltaTime);
-        handleWall(deltaTime);
+        handleBottomWall(deltaTime);
+        handleTopWall(deltaTime);
         updateScore(deltaTime);
         displayStatusText(ctx, barCtx);
         if(!gameOver) requestAnimationFrame(animate);
