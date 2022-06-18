@@ -272,6 +272,9 @@ window.addEventListener('load', function(){
                     this.markedForDeletion = true;
                     enemy.markedForDeletion = true;
                     score += 10;
+                    if(enemy.name === "itemRobot"){
+                        shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                    }
                 }
             });
             //detect collision with wall
@@ -313,6 +316,7 @@ window.addEventListener('load', function(){
     //generate enemies
     class Enemy {
         constructor(gameWidth, gameHeight, willFire){
+            this.name = "enemy1";
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 42;
@@ -451,6 +455,7 @@ window.addEventListener('load', function(){
     //generate item robots
     class ItemRobot {
         constructor(gameWidth, gameHeight){
+            this.name = "itemRobot";
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 73;
@@ -494,25 +499,43 @@ window.addEventListener('load', function(){
 
     //generate shield items
     class ShieldItem {
-        constructor(gameWidth, gameHeight) {
+        constructor(gameWidth, gameHeight, x, y) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 24;
             this.height = 24;
-            this.frameX = 0;
             this.image = document.getElementById("shieldImage");
-            this.x = this.gameWidth;
-            this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = 4;
+            this.frameX = 0;
+            this.frameArray = [0, 44, 86, 130, 176, 222, 264, 304, 346, 386, 426, 470]
+            this.maxFrame = 11;
+            this.frameTimer = 0;
+            this.frameInterval = 1000/20;
+            this.x = x;
+            this.y = y;
+            this.speed = 2;
             this.markedForDeletion = false;
         }
 
         draw(context) {
-            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.arc(this.x + 12, this.y + this.height/2, 12, 0, Math.PI*2);
+            context.stroke();
+            context.drawImage(this.image, this.frameArray[this.frameX], 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
-        update() {
+        update(deltaTime) {
+            //movement
             this.x -= this.speed;
+
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX >= this.maxFrame) this.frameX = 0;
+                else this.frameX++;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
 
             // if player collides with shield item, remove it and add equipped shield object
             if(this.x < player.x + player.width &&
@@ -534,20 +557,9 @@ window.addEventListener('load', function(){
 
     //add, animate, and remove shield items
     function handleShieldItem(deltaTime) {
-        if (shieldTimer > randomShieldInterval) {
-            if(wall.length === 0){
-                shields.push(new ShieldItem(canvas.width, canvas.height));
-            } else {
-                shields.push(new ShieldItem(canvas.width, canvas.height-wall[0].height));
-            }
-            shieldTimer = 0;
-            randomShieldInterval = (Math.random() * 120000) + 120000;
-        } else {
-            shieldTimer += deltaTime;
-        }
         shields.forEach(shield => {
             shield.draw(ctx);
-            shield.update();
+            shield.update(deltaTime);
         });
         //remove gone/equipped shields from array
         shields = shields.filter(shield => !shield.markedForDeletion);
@@ -585,7 +597,7 @@ window.addEventListener('load', function(){
         update(x, y, deltaTime) {
             //handle location
             if(this.xQueue.length === 0) {
-                this.x = x + 15;
+                this.x = x + 20;
                 this.y = this.isTop ? y-50 : y+50;
             }
             this.xQueue.push(x);
@@ -594,7 +606,7 @@ window.addEventListener('load', function(){
             if(this.yQueue.length > 10) this.yQueue.shift();
 
             if(this.lagTimer > this.lagInterval) {
-                this.x = this.xQueue.shift() + 15;
+                this.x = this.xQueue.shift() + 20;
                 this.y = this.isTop ? this.yQueue.shift()-50 : this.yQueue.shift()+50;
                 this.lagTimer = 0;
             } else {
@@ -901,9 +913,6 @@ window.addEventListener('load', function(){
     //helper for player beam
     let beamTimer = 0;
     let beamInterval = 100;
-    //helper for generating shield item
-    let shieldTimer = 0;
-    let randomShieldInterval = Math.random()*120000;
     //helper for generating force item
     let forceTimer = 0;
     let randomForceInterval = Math.random()*120000;
