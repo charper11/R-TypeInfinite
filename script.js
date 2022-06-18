@@ -725,7 +725,7 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("forceImage");
             this.frameX = 0;
             this.x = 0;
-            this.y = Math.random() * (this.gameHeight - this.height);
+            this.y = player.y;
             this.speed = -1;
             this.markedForDeletion = false;
         }
