@@ -206,6 +206,22 @@ window.addEventListener('load', function(){
                 }
             });
 
+            //detect enemy fire collision
+            enemyFires.forEach(fire => {
+                if (collisionDetection(this.x + this.width/2,
+                                       this.y + this.height/2,
+                                       this.width/2,
+                                       this.height/2,
+                                       fire.x + fire.width/2,
+                                       fire.y + fire.height/2,
+                                       fire.width/2,
+                                       fire.height/2,
+                                       false,
+                                       true)) {
+                    gameOver = true;
+                }
+            });
+
             //detect wall collision
             wall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
@@ -388,6 +404,10 @@ window.addEventListener('load', function(){
 
         draw(context){
             context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.arc(this.x + 6, this.y + this.height/2, 6, 0, Math.PI*2);
+            context.stroke();
         }
 
         update(deltaTime){
@@ -562,6 +582,22 @@ window.addEventListener('load', function(){
                     score += 10;
                 }
             });
+
+            //detect enemy fire collision
+            enemyFires.forEach(fire => {
+                if (collisionDetection(this.x + this.width/2,
+                                       this.y + this.height/2,
+                                       this.width/2,
+                                       this.height/2,
+                                       fire.x + fire.width/2,
+                                       fire.y + fire.height/2,
+                                       fire.width/2,
+                                       fire.height/2,
+                                       true,
+                                       true)) {
+                    fire.markedForDeletion = true;
+                }
+            });
         }
     }
 
@@ -685,6 +721,22 @@ window.addEventListener('load', function(){
                                        false)) {
                     enemy.markedForDeletion = true;
                     score += 10;
+                }
+            });
+
+            //detect enemy fire collision
+            enemyFires.forEach(fire => {
+                if (collisionDetection(this.x + this.width/2,
+                                       this.y + this.height/2,
+                                       this.width/2,
+                                       this.height/2,
+                                       fire.x + fire.width/2,
+                                       fire.y + fire.height/2,
+                                       fire.width/2,
+                                       fire.height/2,
+                                       true,
+                                       true)) {
+                    fire.markedForDeletion = true;
                 }
             });
         }
