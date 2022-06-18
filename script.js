@@ -551,7 +551,11 @@ window.addEventListener('load', function(){
                     if(equippedShields.length === 0) {
                         equippedShields.push(new ShieldEquipped(player.x, player.y, true));
                     } else if(equippedShields.length === 1) {
-                        equippedShields.push(new ShieldEquipped(player.x, player.y, false));
+                        if(equippedShields[0].isTop){
+                            equippedShields.push(new ShieldEquipped(player.x, player.y, false));
+                        } else {
+                            equippedShields.push(new ShieldEquipped(player.x, player.y, true));
+                        }
                     }
                 }
 
@@ -590,7 +594,7 @@ window.addEventListener('load', function(){
             this.yQueue = [];
             this.markedForDeletion = false;
             this.isTop = isTop;
-            this.lifespan = 10000;
+            this.lifespan = 20000;
         }
 
         draw(context) {
@@ -651,6 +655,14 @@ window.addEventListener('load', function(){
                                        false)) {
                     enemy.markedForDeletion = true;
                     score += 10;
+                    // handle item drop if shield hits item robot
+                    if(enemy.name === "itemRobot"){
+                        if(equippedForce.length === 0){
+                            force.push(new ForceItem(canvas.width, canvas.height));
+                        } else {
+                            shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                        }
+                    }
                 }
             });
 
@@ -744,7 +756,7 @@ window.addEventListener('load', function(){
             this.frameInterval = 1000/18;
             this.x = x+33;
             this.y = y;
-            this.lifespan = 10000;
+            this.lifespan = 20000;
             this.markedForDeletion = false;
         }
 
@@ -791,6 +803,10 @@ window.addEventListener('load', function(){
                                        false)) {
                     enemy.markedForDeletion = true;
                     score += 10;
+                    // handle item drop if player shoots item robot
+                    if(enemy.name === "itemRobot"){
+                        shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                    }
                 }
             });
 
