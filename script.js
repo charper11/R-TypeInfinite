@@ -396,7 +396,7 @@ window.addEventListener('load', function(){
             this.frameInterval = 1000/20;
             this.x = x;
             this.y = y;
-            this.speed = 2;
+            this.speed = 4;
             this.xSpeed = xSpeed * this.speed;
             this.ySpeed = ySpeed * this.speed;
             this.markedForDeletion = false;
@@ -446,6 +446,50 @@ window.addEventListener('load', function(){
         });
         //remove gone/collided beams from array
         enemyFires = enemyFires.filter(fire => !fire.markedForDeletion);
+    }
+
+    //generate item robots
+    class ItemRobot {
+        constructor(gameWidth, gameHeight){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 73;
+            this.height = 61;
+            this.image = document.getElementById("itemRobot");
+            this.x = this.gameWidth;
+            this.y = Math.random() * (this.gameHeight - this.height);
+            this.speed = 3;
+            this.markedForDeletion = false;
+            this.willFire = false;
+        }
+
+        draw(context){
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.stroke();
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update(){
+            this.x -= this.speed;
+            //if enemy goes off screen, delete
+            if(this.x < 0 - this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //add, animate, and remove item robot
+    function handleItemRobots(deltaTime){
+        if(robotTimer > randomRobotInterval) {
+            if(wall.length === 0) {
+                enemies.push(new ItemRobot(canvas.width, canvas.height));
+            } else {
+                enemies.push(new ItemRobot(canvas.width, canvas.height-wall[0].height));
+            }
+            robotTimer = 0;
+        } else {
+            robotTimer += deltaTime;
+        }
     }
 
     //generate shield items
@@ -866,6 +910,9 @@ window.addEventListener('load', function(){
     //helper for generating wall
     let wallTimer = 0;
     let wallInterval = 10000;
+    // helper for item robot
+    let robotTimer = 0;
+    let randomRobotInterval = Math.random()*12000;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
@@ -879,6 +926,7 @@ window.addEventListener('load', function(){
         handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
         handleEnemies(deltaTime);
         handleEnemyFire(deltaTime);
+        handleItemRobots(deltaTime);
         handleShieldItem(deltaTime);
         handleShieldEquipped(player.x, player.y, deltaTime);
         handleForceItem(deltaTime);
