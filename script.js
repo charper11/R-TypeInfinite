@@ -327,11 +327,18 @@ window.addEventListener('load', function(){
 
         fire(deltaTime){
             if(this.fireTimer > this.fireInterval){
-                enemyFires.push(new EnemyFire(canvas.width, canvas.height, this.x, this.y));
+                const angle = this.getFireAngle();
+                enemyFires.push(new EnemyFire(canvas.width, canvas.height, this.x, this.y, Math.cos(angle), Math.sin(angle)));
                 this.willFire = false;
             } else {
                 this.fireTimer += deltaTime;
             }
+        }
+
+        getFireAngle(){
+            const dx = player.x - this.x;
+            const dy = player.y - this.y;
+            return Math.atan2(dy, dx);
         }
     }
 
@@ -361,7 +368,7 @@ window.addEventListener('load', function(){
 
     // generate enemy fire
     class EnemyFire {
-        constructor(gameWidth, gameHeight, x, y){
+        constructor(gameWidth, gameHeight, x, y, xSpeed, ySpeed){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 12;
@@ -373,7 +380,9 @@ window.addEventListener('load', function(){
             this.frameInterval = 1000/20;
             this.x = x;
             this.y = y;
-            this.speed = -1;
+            this.speed = 2;
+            this.xSpeed = xSpeed * this.speed;
+            this.ySpeed = ySpeed * this.speed;
             this.markedForDeletion = false;
         }
 
@@ -382,9 +391,11 @@ window.addEventListener('load', function(){
         }
 
         update(deltaTime){
-            this.x += this.speed;
+            //fire direction
+            this.x += this.xSpeed;
+            this.y += this.ySpeed;
             //remove beam from array if offscreen
-            if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
+            if(this.x > this.gameWidth + this.width || this.x < 0 || this.y > this.gameHeight + this.width || this.y < 0) this.markedForDeletion = true;
 
             //handle sprite
             if (this.frameTimer > this.frameInterval) {
