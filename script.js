@@ -272,8 +272,13 @@ window.addEventListener('load', function(){
                     this.markedForDeletion = true;
                     enemy.markedForDeletion = true;
                     score += 10;
+                    // handle item drop if player shoots item robot
                     if(enemy.name === "itemRobot"){
-                        shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                        if(equippedForce.length === 0){
+                            force.push(new ForceItem(canvas.width, canvas.height));
+                        } else {
+                            shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                        }
                     }
                 }
             });
@@ -707,17 +712,6 @@ window.addEventListener('load', function(){
 
     //add, animate, and remove force items
     function handleForceItem(deltaTime) {
-        if (forceTimer > randomForceInterval) {
-            if(wall.length === 0){
-                force.push(new ForceItem(canvas.width, canvas.height));
-            } else {
-                force.push(new ForceItem(canvas.width, canvas.height-wall[0].height));
-            }
-            forceTimer = 0;
-            randomForceInterval = (Math.random() * 120000) + 300000;
-        } else {
-            forceTimer += deltaTime;
-        }
         force.forEach(f => {
             f.draw(ctx);
             f.update();
@@ -913,9 +907,6 @@ window.addEventListener('load', function(){
     //helper for player beam
     let beamTimer = 0;
     let beamInterval = 100;
-    //helper for generating force item
-    let forceTimer = 0;
-    let randomForceInterval = Math.random()*120000;
     //helper for generating wall
     let wallTimer = 0;
     let wallInterval = 10000;
