@@ -577,6 +577,7 @@ window.addEventListener('load', function(){
             this.height = 24;
             this.image = document.getElementById("shieldImage");
             this.frameX = 0;
+            this.frameY = 0;
             this.frameArray = [0, 44, 86, 130, 176, 222, 264, 304, 346, 386, 426, 470]
             this.maxFrame = 11;
             this.frameTimer = 0;
@@ -589,6 +590,7 @@ window.addEventListener('load', function(){
             this.yQueue = [];
             this.markedForDeletion = false;
             this.isTop = isTop;
+            this.lifespan = 10000;
         }
 
         draw(context) {
@@ -596,7 +598,7 @@ window.addEventListener('load', function(){
             context.beginPath();
             context.arc(this.x + 12, this.y + this.height/2, 12, 0, Math.PI*2);
             context.stroke();
-            context.drawImage(this.image, this.frameArray[this.frameX], 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.frameArray[this.frameX], this.height*this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
         update(x, y, deltaTime) {
@@ -618,10 +620,18 @@ window.addEventListener('load', function(){
                 this.lagTimer += deltaTime;
             }
 
+            //handle lifespan
+            if(this.lifespan <= 0) this.markedForDeletion = true;
+            else this.lifespan -= deltaTime;
+
             //handle sprite
             if(this.frameTimer > this.frameInterval){
                 if(this.frameX >= this.maxFrame) this.frameX = 0;
                 else this.frameX++;
+                //blink if force is about to expire
+                if(this.lifespan < 5000){
+                    this.frameY = this.frameY === 1 ? 0 : 1;
+                }
                 this.frameTimer = 0;
             } else {
                 this.frameTimer += deltaTime;
