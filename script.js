@@ -727,12 +727,14 @@ window.addEventListener('load', function(){
             this.height = 36;
             this.image = document.getElementById("forceImage");
             this.frameX = 0;
+            this.frameY = 0;
             this.frameArray = [0, 68, 136, 196, 258, 324];
             this.maxFrame = 5;
             this.frameTimer = 0;
             this.frameInterval = 1000/18;
             this.x = x+33;
             this.y = y;
+            this.lifespan = 10000;
             this.markedForDeletion = false;
         }
 
@@ -741,17 +743,25 @@ window.addEventListener('load', function(){
             context.beginPath();
             context.arc(this.x + 36/2, this.y + this.height/2, 36/2, 0, Math.PI*2);
             context.stroke();
-            context.drawImage(this.image, this.frameArray[this.frameX], 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.frameArray[this.frameX], this.frameY*this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
         update(x, y, deltaTime) {
             this.x = x+65;
             this.y = y;
 
+            //handle lifespan
+            if(this.lifespan <= 0) this.markedForDeletion = true;
+            else this.lifespan -= deltaTime;
+
             //handle sprite
             if(this.frameTimer > this.frameInterval) {
                 if(this.frameX >= this.maxFrame) this.frameX = 0;
                 else this.frameX ++;
+                //blink if force is about to expire
+                if(this.lifespan < 5000){
+                    this.frameY = this.frameY === 1 ? 0 : 1;
+                }
                 this.frameTimer = 0;
             } else {
                 this.frameTimer += deltaTime;
