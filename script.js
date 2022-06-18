@@ -11,6 +11,7 @@ window.addEventListener('load', function(){
     gameBarCanvas.height = 50;
 
     let enemies = [];
+    let enemyFires = [];
     let playerBeams = [];
     let beamPower = 0;
     let stars = [];
@@ -295,7 +296,7 @@ window.addEventListener('load', function(){
 
     //generate enemies
     class Enemy {
-        constructor(gameWidth, gameHeight){
+        constructor(gameWidth, gameHeight, willFire){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 42;
@@ -304,6 +305,9 @@ window.addEventListener('load', function(){
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height);
             this.speed = 3;
+            this.willFire = willFire;
+            this.fireInterval = Math.random() * (this.gameWidth / this.speed);
+            this.fireTimer = 0;
             this.markedForDeletion = false;
         }
 
@@ -320,15 +324,26 @@ window.addEventListener('load', function(){
             //if enemy goes off screen, delete
             if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
+
+        fire(deltaTime){
+            if(this.fireTimer > this.fireInterval){
+                enemyFires.push(new EnemyFire(canvas.width, canvas.height, this.x, this.y));
+                this.willFire = false;
+            } else {
+                this.fireTimer += deltaTime;
+            }
+        }
     }
 
     //add, animate, and remove enemies
     function handleEnemies(deltaTime){
         if(enemyTimer > enemyInterval + randomEnemyInterval) {
+            // each enemy has a 25% of firing
+            const willFire = Math.random() < 0.25;
             if(wall.length === 0) {
-                enemies.push(new Enemy(canvas.width, canvas.height));
+                enemies.push(new Enemy(canvas.width, canvas.height, willFire));
             } else {
-                enemies.push(new Enemy(canvas.width, canvas.height-wall[0].height));
+                enemies.push(new Enemy(canvas.width, canvas.height-wall[0].height, willFire));
             }
             enemyTimer = 0;
             randomEnemyInterval = Math.random()*1000;
@@ -338,9 +353,68 @@ window.addEventListener('load', function(){
         enemies.forEach(enemy => {
             enemy.draw(ctx);
             enemy.update();
+            if(enemy.willFire) enemy.fire(deltaTime);
         });
         //remove gone/dead enemies from array
         enemies = enemies.filter(enemy => !enemy.markedForDeletion);
+    }
+
+    // generate enemy fire
+    class EnemyFire {
+        constructor(gameWidth, gameHeight, x, y){
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.width = 12;
+            this.height = 12;
+            this.image = document.getElementById("enemyFire");
+            this.frameX = 0;
+            this.frameTimer = 0;
+            this.maxFrame = 3;
+            this.frameInterval = 1000/20;
+            this.x = x;
+            this.y = y;
+            this.speed = -1;
+            this.markedForDeletion = false;
+        }
+
+        draw(context){
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
+
+        update(deltaTime){
+            this.x += this.speed;
+            //remove beam from array if offscreen
+            if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
+
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX >= this.maxFrame) this.frameX = 0;
+                else this.frameX++;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
+
+            //detect collision with wall
+            wall.forEach(w => {
+                if(this.x < w.x + w.widthTotal &&
+                   this.x + this.width > w.x &&
+                   this.y < w.y + w.height &&
+                   this.y + this.height > w.y){
+                    this.markedForDeletion = true;
+                   }
+            });
+        }
+    }
+
+    //animate and remove enemy fire
+    function handleEnemyFire(deltaTime){
+        enemyFires.forEach(fire => {
+            fire.draw(ctx);
+            fire.update(deltaTime);
+        });
+        //remove gone/collided beams from array
+        enemyFires = enemyFires.filter(fire => !fire.markedForDeletion);
     }
 
     //generate shield items
@@ -741,6 +815,7 @@ window.addEventListener('load', function(){
         player.update(input);
         handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
         handleEnemies(deltaTime);
+        handleEnemyFire(deltaTime);
         handleShieldItem(deltaTime);
         handleShieldEquipped(player.x, player.y, deltaTime);
         handleForceItem(deltaTime);

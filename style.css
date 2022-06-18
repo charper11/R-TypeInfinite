@@ -23,6 +23,6 @@ body {
     border: 5px solid red;
 }
 
-#playerImage, #enemyImage, #playerBeamImage, #shieldImage, #forceImage, #wallStart, #wallMiddle, #wallEnd {
+#playerImage, #enemyImage, #playerBeamImage, #shieldImage, #forceImage, #wallStart, #wallMiddle, #wallEnd, #enemyFire {
     display: none;
 }
