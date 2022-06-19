@@ -296,9 +296,10 @@ window.addEventListener('load', function(){
                                        enemy.height/2,
                                        false,
                                        false)) {
+                    if(enemy.shield <= 0) enemy.markedForDeletion = true;
+                    else enemy.shield -= this.power;
                     this.power--;
                     if(this.power === 0) this.markedForDeletion = true;
-                    enemy.markedForDeletion = true;
                     score += 10;
                     // handle item drop if player shoots item robot
                     if(enemy.name === "itemRobot"){
@@ -388,6 +389,7 @@ window.addEventListener('load', function(){
             this.willFire = willFire;
             this.fireInterval = (Math.random() * (this.gameWidth / (this.speed*60)))*1000;
             this.fireTimer = 0;
+            this.shield = 0;
             this.markedForDeletion = false;
         }
 
@@ -523,6 +525,7 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("largeEnemy");
             this.willFire = false;
             this.fireInterval = (Math.random() * 2000)+1000;
+            this.shield = 1;
         }
 
         update(deltaTime){
@@ -731,7 +734,8 @@ window.addEventListener('load', function(){
                                        enemy.height/2,
                                        true,
                                        false)) {
-                    enemy.markedForDeletion = true;
+                    if(enemy.shield <= 0) enemy.markedForDeletion = true;
+                    else enemy.shield--;
                     score += 10;
                     // handle item drop if shield hits item robot
                     if(enemy.name === "itemRobot"){
@@ -879,7 +883,8 @@ window.addEventListener('load', function(){
                                        enemy.height / 2,
                                        true,
                                        false)) {
-                    enemy.markedForDeletion = true;
+                    if(enemy.shield <= 0) enemy.markedForDeletion = true;
+                    else enemy.shield--;
                     score += 10;
                     // handle item drop if player shoots item robot
                     if(enemy.name === "itemRobot"){
