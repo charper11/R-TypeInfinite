@@ -296,8 +296,12 @@ window.addEventListener('load', function(){
                                        enemy.height/2,
                                        false,
                                        false)) {
-                    if(enemy.shield <= 0) enemy.markedForDeletion = true;
-                    else enemy.shield -= this.power;
+                    if(enemy.shield <= 0) {
+                        enemy.markedForDeletion = true;
+                    } else {
+                        enemy.shield -= this.power;
+                        enemy.frameY = 1;
+                    }
                     this.power--;
                     if(this.power === 0) this.markedForDeletion = true;
                     score += 10;
@@ -526,6 +530,11 @@ window.addEventListener('load', function(){
             this.willFire = false;
             this.fireInterval = (Math.random() * 2000)+1000;
             this.shield = 6;
+            this.frameY = 0;
+        }
+
+        draw(context) {
+            context.drawImage(this.image, 0, this.height*this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
         update(deltaTime){
@@ -533,6 +542,8 @@ window.addEventListener('load', function(){
             this.x -= this.speed;
             //fire
             this.fire(deltaTime);
+            //reset frameY incase its been hit
+            this.frameY = 0;
             //if enemy goes off screen, delete
             if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
@@ -743,6 +754,7 @@ window.addEventListener('load', function(){
                             enemy.markedForDeletion = true;
                         } else {
                             enemy.shield--;
+                            enemy.frameY = 1;
                             this.damageTimer = 0;
                         }
                         score += 10;
@@ -902,6 +914,7 @@ window.addEventListener('load', function(){
                             enemy.markedForDeletion = true;
                         } else {
                             enemy.shield--;
+                            enemy.frameY = 1;
                             this.damageTimer = 0;
                         }
                         score += 10;
