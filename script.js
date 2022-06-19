@@ -549,6 +549,7 @@ window.addEventListener('load', function(){
                 enemies.push(new LargeEnemy(canvas.width, canvas.height-64));
             }
             largeEnemyTimer = 0;
+            largeEnemyInterval = Math.random() * 10000;
         } else {
             largeEnemyTimer += deltaTime;
         }
@@ -578,6 +579,7 @@ window.addEventListener('load', function(){
                 enemies.push(new ItemRobot(canvas.width, canvas.height-64));
             }
             robotTimer = 0;
+            randomRobotInterval = Math.random() * 30000;
         } else {
             robotTimer += deltaTime;
         }
@@ -675,7 +677,7 @@ window.addEventListener('load', function(){
             this.yQueue = [];
             this.markedForDeletion = false;
             this.isTop = isTop;
-            this.lifespan = 20000;
+            this.lifespan = 60000;
             this.damageTimer = 100;
             this.damageInterval = 100;
         }
@@ -848,7 +850,7 @@ window.addEventListener('load', function(){
             this.frameInterval = 1000/18;
             this.x = x+33;
             this.y = y;
-            this.lifespan = 20000;
+            this.lifespan = 60000;
             this.damageTimer = 100;
             this.damageInterval = 100;
             this.markedForDeletion = false;
@@ -1087,7 +1089,7 @@ window.addEventListener('load', function(){
     let largeEnemyInterval = Math.random()*12000;
     // helper for item robot
     let robotTimer = 0;
-    let randomRobotInterval = Math.random()*12000;
+    let randomRobotInterval = Math.random()*30000;
 
     //main animation loop running at 60fps
     function animate(timeStamp){
