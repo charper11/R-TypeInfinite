@@ -245,7 +245,7 @@ window.addEventListener('load', function(){
 
     // generate player beam blasts
     class PlayerBeam {
-        constructor(gameWidth, gameHeight, x, y, width, height, image, power){
+        constructor(gameWidth, gameHeight, x, y, width, height, image, power, speed){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = width;
@@ -257,7 +257,7 @@ window.addEventListener('load', function(){
             this.frameInterval = 1000/20;
             this.x = x;
             this.y = y;
-            this.speed = 25;
+            this.speed = speed;
             this.power = power;
             this.markedForDeletion = false;
         }
@@ -342,23 +342,23 @@ window.addEventListener('load', function(){
         } else if(beamPower) {
             switch(beamPower) {
                 case 1:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 32, 8, "charge1Image", 1));
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 32, 8, "charge1Image", 1, 25));
                     break;
                 case 2:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 34, 24, "charge2Image", 2));
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 34, 24, "charge2Image", 2, 20));
                     break;
                 case 3:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 66, 24, "charge3Image", 3));
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 66, 24, "charge3Image", 3, 15));
                     break;
                 case 4:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 98, 28, "charge4Image", 4));
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 98, 28, "charge4Image", 4, 15));
                     break;
                 case 5:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 130, 28, "charge5Image", 5));
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 130, 28, "charge5Image", 5, 15));
                     break;
                 default:
                     //6
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 161, 32, "charge6Image", 6));
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 161, 32, "charge6Image", 6, 15));
             }
             beamTimer = 0;
             beamPower = 0;
