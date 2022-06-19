@@ -386,7 +386,7 @@ window.addEventListener('load', function(){
             this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
             this.speed = 3;
             this.willFire = willFire;
-            this.fireInterval = Math.random() * (this.gameWidth / this.speed);
+            this.fireInterval = (Math.random() * (this.gameWidth / (this.speed*60)))*1000;
             this.fireTimer = 0;
             this.markedForDeletion = false;
         }
@@ -410,6 +410,7 @@ window.addEventListener('load', function(){
                 const angle = this.getFireAngle();
                 enemyFires.push(new EnemyFire(canvas.width, canvas.height, this.x, this.y, Math.cos(angle), Math.sin(angle)));
                 this.willFire = false;
+                this.fireTimer = 0;
             } else {
                 this.fireTimer += deltaTime;
             }
@@ -441,7 +442,7 @@ window.addEventListener('load', function(){
         }
         enemies.forEach(enemy => {
             enemy.draw(ctx);
-            enemy.update();
+            enemy.update(deltaTime);
             if(enemy.willFire) enemy.fire(deltaTime);
         });
         //remove gone/dead enemies from array
@@ -514,34 +515,51 @@ window.addEventListener('load', function(){
         enemyFires = enemyFires.filter(fire => !fire.markedForDeletion);
     }
 
-    //generate item robots
-    class ItemRobot {
+    class LargeEnemy extends Enemy {
         constructor(gameWidth, gameHeight){
-            this.name = "itemRobot";
-            this.gameWidth = gameWidth;
-            this.gameHeight = gameHeight;
-            this.width = 73;
-            this.height = 61;
-            this.image = document.getElementById("itemRobot");
-            this.x = this.gameWidth;
-            this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
-            this.speed = 3;
-            this.markedForDeletion = false;
+            super(gameWidth, gameHeight);
+            this.width = 98;
+            this.height = 90;
+            this.image = document.getElementById("largeEnemy");
             this.willFire = false;
         }
 
-        draw(context){
-            context.strokeStyle = 'white';
-            context.beginPath();
-            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
-            context.stroke();
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
-        }
-
-        update(){
+        update(deltaTime){
+            //movement
             this.x -= this.speed;
+            //fire
+            this.fire(deltaTime);
             //if enemy goes off screen, delete
             if(this.x < 0 - this.width) this.markedForDeletion = true;
+        }
+    }
+
+    //add, animate, and remove large enemies
+    function handleLargeEnemies(deltaTime){
+        if(largeEnemyTimer > largeEnemyInterval) {
+            if(bottomWall.length === 0 && topWall.length === 0) {
+                enemies.push(new LargeEnemy(canvas.width, canvas.height));
+            } else if(bottomWall.length > 0 && topWall.length > 0) {
+                enemies.push(new LargeEnemy(canvas.width, canvas.height-(bottomWall[0].height*2)));
+            } else {
+                enemies.push(new LargeEnemy(canvas.width, canvas.height-64));
+            }
+            largeEnemyTimer = 0;
+        } else {
+            largeEnemyTimer += deltaTime;
+        }
+    }
+
+    //generate item robots
+    class ItemRobot extends Enemy {
+        constructor(gameWidth, gameHeight){
+            super(gameWidth, gameHeight);
+            this.name = "itemRobot";
+            this.width = 73;
+            this.height = 61;
+            this.image = document.getElementById("itemRobot");
+            this.speed = 3;
+            this.willFire = false;
         }
     }
 
@@ -1038,6 +1056,9 @@ window.addEventListener('load', function(){
     let topWallTimer = 0;
     let wallInterval = 10000;
     let topWallInterval = 10000;
+    // helper for large enemy
+    let largeEnemyTimer = 0;
+    let largeEnemyInterval = Math.random()*12000;
     // helper for item robot
     let robotTimer = 0;
     let randomRobotInterval = Math.random()*12000;
@@ -1053,6 +1074,7 @@ window.addEventListener('load', function(){
         player.update(input);
         handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
         handleEnemies(deltaTime);
+        handleLargeEnemies(deltaTime);
         handleEnemyFire(deltaTime);
         handleItemRobots(deltaTime);
         handleShieldItem(deltaTime);
