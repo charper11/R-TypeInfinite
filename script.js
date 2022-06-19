@@ -245,12 +245,16 @@ window.addEventListener('load', function(){
 
     // generate player beam blasts
     class PlayerBeam {
-        constructor(gameWidth, gameHeight, x, y){
+        constructor(gameWidth, gameHeight, x, y, width, height, image){
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 32;
-            this.height = 8;
-            this.image = document.getElementById("playerBeamImage");
+            this.width = width;
+            this.height = height;
+            this.image = document.getElementById(image);
+            this.frameX = 0;
+            this.frameTimer = 0;
+            this.maxFrame = 1;
+            this.frameInterval = 1000/20;
             this.x = x;
             this.y = y;
             this.speed = 25;
@@ -258,13 +262,26 @@ window.addEventListener('load', function(){
         }
 
         draw(context){
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.stroke();
         }
 
-        update(){
+        update(deltaTime){
             this.x += this.speed;
             //remove beam from array if offscreen
             if(this.x > this.gameWidth + this.width) this.markedForDeletion = true;
+
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX >= this.maxFrame) this.frameX = 0;
+                else this.frameX++;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
 
             //detect enemy collision
             enemies.forEach(enemy => {
@@ -321,7 +338,26 @@ window.addEventListener('load', function(){
                 beamTimer += deltaTime;
             }
         } else if(beamPower) {
-            playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y));
+            switch(beamPower) {
+                case 1:
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 32, 8, "charge1Image"));
+                    break;
+                case 2:
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 34, 24, "charge2Image"));
+                    break;
+                case 3:
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 66, 24, "charge3Image"));
+                    break;
+                case 4:
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 98, 28, "charge4Image"));
+                    break;
+                case 5:
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 130, 28, "charge5Image"));
+                    break;
+                default:
+                    //6
+                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 161, 32, "charge6Image"));
+            }
             beamTimer = 0;
             beamPower = 0;
         } else {
@@ -329,7 +365,7 @@ window.addEventListener('load', function(){
         }
         playerBeams.forEach(beam => {
             beam.draw(ctx);
-            beam.update();
+            beam.update(deltaTime);
         });
         //remove gone/collided beams from array
         playerBeams = playerBeams.filter(beam => !beam.markedForDeletion);
