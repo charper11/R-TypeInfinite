@@ -26,6 +26,6 @@ body {
 #playerImage, #charge1Image, #charge2Image, #charge3Image, #charge4Image,
 #charge5Image, #charge6Image, #enemyImage, #shieldImage, #forceImage,
 #wallStart, #wallMiddle, #wallEnd, #enemyFire, #itemRobot, #topWallStart,
-#topWallMiddle, #topWallEnd, #largeEnemy {
+#topWallMiddle, #topWallEnd, #largeEnemy, #enemyExplosion {
     display: none;
 }

@@ -21,6 +21,7 @@ window.addEventListener('load', function(){
     let equippedForce = [];
     let topWall = [];
     let bottomWall = [];
+    let explosions = [];
     let score = 0;
     let gameOver = false;
 
@@ -298,6 +299,7 @@ window.addEventListener('load', function(){
                                        false)) {
                     if(enemy.shield <= 0) {
                         enemy.markedForDeletion = true;
+                        explosions.push(new Explosion(enemy.x, enemy.y));
                     } else {
                         enemy.shield -= this.power;
                         enemy.frameY = 1;
@@ -376,6 +378,46 @@ window.addEventListener('load', function(){
         });
         //remove gone/collided beams from array
         playerBeams = playerBeams.filter(beam => !beam.markedForDeletion);
+    }
+
+    // handle explosion on enemy death
+    class Explosion {
+        constructor(x, y){
+            this.x = x;
+            this.y = y;
+            this.width = 72;
+            this.height = 60;
+            this.image = document.getElementById("enemyExplosion");
+            this.frameX = 3;
+            this.frameTimer = 0;
+            this.frameInterval = 1000/20;
+            this.markedForDeletion = false;
+        }
+
+        draw(context){
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
+
+        update(deltaTime){
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX <= 0) this.markedForDeletion = true;
+                else this.frameX--;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
+        }
+    }
+
+    //animate and remove explosion
+    function handleExplosions(deltaTime) {
+        explosions.forEach(explosion => {
+            explosion.draw(ctx);
+            explosion.update(deltaTime);
+        });
+        //remove finished explosions
+        explosions = explosions.filter(explosion => !explosion.markedForDeletion);
     }
 
     //generate enemies
@@ -752,6 +794,7 @@ window.addEventListener('load', function(){
                                         false)) {
                         if(enemy.shield <= 0){
                             enemy.markedForDeletion = true;
+                            explosions.push(new Explosion(enemy.x, enemy.y));
                         } else {
                             enemy.shield--;
                             enemy.frameY = 1;
@@ -912,6 +955,7 @@ window.addEventListener('load', function(){
                                         false)) {
                         if(enemy.shield <= 0) {
                             enemy.markedForDeletion = true;
+                            explosions.push(new Explosion(enemy.x, enemy.y));
                         } else {
                             enemy.shield--;
                             enemy.frameY = 1;
@@ -1114,6 +1158,7 @@ window.addEventListener('load', function(){
         player.draw(ctx);
         player.update(input);
         handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
+        handleExplosions(deltaTime);
         handleEnemies(deltaTime);
         handleLargeEnemies(deltaTime);
         handleEnemyFire(deltaTime);
