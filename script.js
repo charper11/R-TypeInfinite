@@ -522,6 +522,7 @@ window.addEventListener('load', function(){
             this.height = 90;
             this.image = document.getElementById("largeEnemy");
             this.willFire = false;
+            this.fireInterval = (Math.random() * 2000)+1000;
         }
 
         update(deltaTime){
