@@ -525,7 +525,7 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("largeEnemy");
             this.willFire = false;
             this.fireInterval = (Math.random() * 2000)+1000;
-            this.shield = 1;
+            this.shield = 6;
         }
 
         update(deltaTime){
@@ -676,6 +676,8 @@ window.addEventListener('load', function(){
             this.markedForDeletion = false;
             this.isTop = isTop;
             this.lifespan = 20000;
+            this.damageTimer = 100;
+            this.damageInterval = 100;
         }
 
         draw(context) {
@@ -723,30 +725,38 @@ window.addEventListener('load', function(){
             }
 
             //detect enemy collision
-            enemies.forEach(enemy => {
-                if (collisionDetection(this.x + this.width/2,
-                                       this.y + this.height/2,
-                                       this.width/2,
-                                       this.height/2,
-                                       enemy.x + enemy.width/2,
-                                       enemy.y + enemy.height/2,
-                                       enemy.width/2,
-                                       enemy.height/2,
-                                       true,
-                                       false)) {
-                    if(enemy.shield <= 0) enemy.markedForDeletion = true;
-                    else enemy.shield--;
-                    score += 10;
-                    // handle item drop if shield hits item robot
-                    if(enemy.name === "itemRobot"){
-                        if(equippedForce.length === 0){
-                            force.push(new ForceItem(canvas.width, canvas.height));
+            if(this.damageTimer > this.damageInterval){
+                enemies.forEach(enemy => {
+                    if (collisionDetection(this.x + this.width/2,
+                                        this.y + this.height/2,
+                                        this.width/2,
+                                        this.height/2,
+                                        enemy.x + enemy.width/2,
+                                        enemy.y + enemy.height/2,
+                                        enemy.width/2,
+                                        enemy.height/2,
+                                        true,
+                                        false)) {
+                        if(enemy.shield <= 0){
+                            enemy.markedForDeletion = true;
                         } else {
-                            shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                            enemy.shield--;
+                            this.damageTimer = 0;
+                        }
+                        score += 10;
+                        // handle item drop if shield hits item robot
+                        if(enemy.name === "itemRobot"){
+                            if(equippedForce.length === 0){
+                                force.push(new ForceItem(canvas.width, canvas.height));
+                            } else {
+                                shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                this.damageTimer += deltaTime;
+            }
 
             //detect enemy fire collision
             enemyFires.forEach(fire => {
@@ -839,6 +849,8 @@ window.addEventListener('load', function(){
             this.x = x+33;
             this.y = y;
             this.lifespan = 20000;
+            this.damageTimer = 100;
+            this.damageInterval = 100;
             this.markedForDeletion = false;
         }
 
@@ -872,26 +884,34 @@ window.addEventListener('load', function(){
             }
 
             //detect enemy collision
-            enemies.forEach(enemy => {
-                if (collisionDetection(this.x + this.width / 2,
-                                       this.y + this.height / 2,
-                                       this.width / 2,
-                                       this.height / 2,
-                                       enemy.x + enemy.width / 2,
-                                       enemy.y + enemy.height / 2,
-                                       enemy.width / 2,
-                                       enemy.height / 2,
-                                       true,
-                                       false)) {
-                    if(enemy.shield <= 0) enemy.markedForDeletion = true;
-                    else enemy.shield--;
-                    score += 10;
-                    // handle item drop if player shoots item robot
-                    if(enemy.name === "itemRobot"){
-                        shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+            if(this.damageTimer > this.damageInterval) {
+                enemies.forEach(enemy => {
+                    if (collisionDetection(this.x + this.width / 2,
+                                        this.y + this.height / 2,
+                                        this.width / 2,
+                                        this.height / 2,
+                                        enemy.x + enemy.width / 2,
+                                        enemy.y + enemy.height / 2,
+                                        enemy.width / 2,
+                                        enemy.height / 2,
+                                        true,
+                                        false)) {
+                        if(enemy.shield <= 0) {
+                            enemy.markedForDeletion = true;
+                        } else {
+                            enemy.shield--;
+                            this.damageTimer = 0;
+                        }
+                        score += 10;
+                        // handle item drop if player shoots item robot
+                        if(enemy.name === "itemRobot"){
+                            shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                this.damageTimer += deltaTime;
+            }
 
             //detect enemy fire collision
             enemyFires.forEach(fire => {
