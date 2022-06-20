@@ -54,7 +54,7 @@ window.addEventListener('load', function(){
             this.height = 1;
             this.x = x;
             this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = 1;
+            this.speed = Math.floor(Math.random()*2)+1;
             this.markedForDeletion = false;
         }
 
