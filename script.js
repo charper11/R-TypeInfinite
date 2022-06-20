@@ -50,8 +50,8 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight, x) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 1;
-            this.height = 1;
+            this.width = Math.floor(Math.random()*2)+1;
+            this.height = Math.floor(Math.random()*2)+1;
             this.x = x;
             this.y = Math.random() * (this.gameHeight - this.height);
             this.speed = Math.floor(Math.random()*2)+1;
