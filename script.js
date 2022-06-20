@@ -632,6 +632,10 @@ window.addEventListener('load', function(){
         }
 
         draw(context) {
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.stroke();
             context.drawImage(this.image, 0, this.height*this.frameY, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
