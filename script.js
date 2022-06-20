@@ -50,16 +50,18 @@ window.addEventListener('load', function(){
         constructor(gameWidth, gameHeight, x) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = Math.floor(Math.random()*2)+1;
-            this.height = Math.floor(Math.random()*2)+1;
+            this.width = Math.floor(Math.random()*3)+1;
+            this.height = Math.floor(Math.random()*3)+1;
             this.x = x;
             this.y = Math.random() * (this.gameHeight - this.height);
-            this.speed = Math.floor(Math.random()*2)+1;
+            this.speed = (this.height === 1 && this.width > 1) ? 4 : Math.floor(Math.random()*2)+1;
             this.markedForDeletion = false;
+            this.color = Math.floor(Math.random()*4);
+            this.colorOptions = ['rgb(0, 0, 255)', 'rgb(31, 81, 255)', 'rgb(139,0,139)', 'rgb(64,224,208)'];
         }
 
         draw(context) {
-            context.fillStyle = 'white';
+            context.fillStyle = this.colorOptions[this.color];
             context.fillRect(this.x, this.y, this.width, this.height);
         }
 
@@ -72,7 +74,7 @@ window.addEventListener('load', function(){
 
     //endlessly scrolling background
     function background() {
-        if(stars.length < 50) stars.push(new Star(canvas.width, canvas.height, canvas.width));
+        if(stars.length < 100) stars.push(new Star(canvas.width, canvas.height, canvas.width));
         stars.forEach(star => {
             star.draw(ctx);
             star.update();
@@ -1181,7 +1183,7 @@ window.addEventListener('load', function(){
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
     //add stars for the game start
-    for(let i = 0; i < 50; i++) stars.push(new Star(canvas.width, canvas.height, Math.random() * canvas.width));
+    for(let i = 0; i < 100; i++) stars.push(new Star(canvas.width, canvas.height, Math.random() * canvas.width));
     //helper vars for generating enemies on time
     let lastTime = 0;
     let enemyTimer = 0;
