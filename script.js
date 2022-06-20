@@ -47,12 +47,12 @@ window.addEventListener('load', function(){
 
     //star object for background
     class Star {
-        constructor(gameWidth, gameHeight) {
+        constructor(gameWidth, gameHeight, x) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
             this.width = 1;
             this.height = 1;
-            this.x = this.gameWidth;
+            this.x = x;
             this.y = Math.random() * (this.gameHeight - this.height);
             this.speed = 1;
             this.markedForDeletion = false;
@@ -72,7 +72,7 @@ window.addEventListener('load', function(){
 
     //endlessly scrolling background
     function background() {
-        stars.push(new Star(canvas.width, canvas.height));
+        if(stars.length < 50) stars.push(new Star(canvas.width, canvas.height, canvas.width));
         stars.forEach(star => {
             star.draw(ctx);
             star.update();
@@ -1180,6 +1180,8 @@ window.addEventListener('load', function(){
 
     const input = new InputHandler();
     const player = new Player(canvas.width, canvas.height);
+    //add stars for the game start
+    for(let i = 0; i < 50; i++) stars.push(new Star(canvas.width, canvas.height, Math.random() * canvas.width));
     //helper vars for generating enemies on time
     let lastTime = 0;
     let enemyTimer = 0;
