@@ -22,6 +22,7 @@ window.addEventListener('load', function(){
     let topWall = [];
     let bottomWall = [];
     let explosions = [];
+    let sparks = [];
     let score = 0;
     let gameOver = false;
 
@@ -340,6 +341,11 @@ window.addEventListener('load', function(){
     //add, animate, and remove player beam
     function handlePlayerBeam(input, x, y, deltaTime){
         if(input.keys.indexOf('s') > -1) {
+            //add spark animation when charging up
+            if(sparks.length === 0 && beamPower > 1){
+                if(equippedForce.length === 0) sparks.push(new ChargeSparks(x, player.y-player.height/2));
+                else sparks.push(new ChargeSparks(x+equippedForce[0].width, player.y-player.height/2));
+            }
             if(beamTimer > beamInterval) {
                 if(beamPower < 10) beamPower++;
                 beamTimer = 0;
@@ -369,6 +375,8 @@ window.addEventListener('load', function(){
             }
             beamTimer = 0;
             beamPower = 0;
+            //end spark animation on fire
+            sparks.forEach(spark => {spark.markedForDeletion = true;});
         } else {
             beamTimer += deltaTime;
         }
@@ -378,6 +386,51 @@ window.addEventListener('load', function(){
         });
         //remove gone/collided beams from array
         playerBeams = playerBeams.filter(beam => !beam.markedForDeletion);
+    }
+
+    // handle sparks on beam charge up
+    class ChargeSparks {
+        constructor(x, y){
+            this.x = x;
+            this.y = y;
+            this.width = 62;
+            this.height = 64;
+            this.image = document.getElementById("chargeSparks");
+            this.frameX = 7;
+            this.frameTimer = 0;
+            this.frameInterval = 1000/20;
+            this.markedForDeletion = false;
+        }
+
+        draw(context){
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
+
+        update(x, y, deltaTime){
+            //stay with player, adjust if force equipped
+            this.y = y;
+            if(equippedForce.length === 0) this.x = x;
+            else this.x = x+equippedForce[0].width;
+
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX <= 0) this.frameX = 7;
+                else this.frameX--;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
+        }
+    }
+
+    //animate and remove sparks
+    function handleSparks(x, y, deltaTime) {
+        sparks.forEach(spark => {
+            spark.draw(ctx);
+            spark.update(x, y, deltaTime);
+        });
+        //remove sparks on fire
+        sparks = sparks.filter(spark => !spark.markedForDeletion);
     }
 
     // handle explosion on enemy death
@@ -1158,6 +1211,7 @@ window.addEventListener('load', function(){
         player.draw(ctx);
         player.update(input);
         handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
+        handleSparks(player.x+player.width-10, player.y-player.height/2, deltaTime);
         handleExplosions(deltaTime);
         handleEnemies(deltaTime);
         handleLargeEnemies(deltaTime);
