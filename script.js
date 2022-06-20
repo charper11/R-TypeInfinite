@@ -452,6 +452,7 @@ window.addEventListener('load', function(){
         }
 
         update(deltaTime){
+            this.x--;
             //handle sprite
             if (this.frameTimer > this.frameInterval) {
                 if (this.frameX <= 0) this.markedForDeletion = true;
