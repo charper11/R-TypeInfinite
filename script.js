@@ -318,21 +318,21 @@ window.addEventListener('load', function(){
                     }
                 }
             });
-            //detect collision with wall
+            //detect wall collision
             bottomWall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
                    this.x + this.width > w.x &&
-                   this.y < w.y + w.height &&
-                   this.y + this.height > w.y){
-                    this.markedForDeletion = true;
+                   this.y < w.hitboxY + w.hitboxHeight &&
+                   this.y + this.height > w.hitboxY){
+                      this.markedForDeletion = true;
                    }
             });
             topWall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
                    this.x + this.width > w.x &&
-                   this.y < w.y + w.height &&
-                   this.y + this.height > w.y){
-                    this.markedForDeletion = true;
+                   this.y < w.hitboxY + w.hitboxHeight &&
+                   this.y + this.height > w.hitboxY){
+                      this.markedForDeletion = true;
                    }
             });
         }
@@ -612,13 +612,21 @@ window.addEventListener('load', function(){
                 this.frameTimer += deltaTime;
             }
 
-            //detect collision with wall
+            //detect wall collision
             bottomWall.forEach(w => {
                 if(this.x < w.x + w.widthTotal &&
                    this.x + this.width > w.x &&
-                   this.y < w.y + w.height &&
-                   this.y + this.height > w.y){
-                    this.markedForDeletion = true;
+                   this.y < w.hitboxY + w.hitboxHeight &&
+                   this.y + this.height > w.hitboxY){
+                      this.markedForDeletion = true;
+                   }
+            });
+            topWall.forEach(w => {
+                if(this.x < w.x + w.widthTotal &&
+                   this.x + this.width > w.x &&
+                   this.y < w.hitboxY + w.hitboxHeight &&
+                   this.y + this.height > w.hitboxY){
+                      this.markedForDeletion = true;
                    }
             });
         }
