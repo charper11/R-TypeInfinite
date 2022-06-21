@@ -202,7 +202,7 @@ window.addEventListener('load', function(){
                                        enemy.x + enemy.width/2,
                                        enemy.y + enemy.height/2,
                                        enemy.width/2,
-                                       enemy.height/2,
+                                       enemy.hitboxHeight[enemy.frameX]/2,
                                        false,
                                        false)) {
                     gameOver = true;
@@ -295,7 +295,7 @@ window.addEventListener('load', function(){
                                        enemy.x + enemy.width/2,
                                        enemy.y + enemy.height/2,
                                        enemy.width/2,
-                                       enemy.height/2,
+                                       enemy.hitboxHeight[enemy.frameX]/2,
                                        false,
                                        false)) {
                     if(enemy.shield <= 0) {
@@ -480,9 +480,14 @@ window.addEventListener('load', function(){
             this.name = "enemy1";
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 42;
-            this.height = 48;
+            this.width = 40;
+            this.height = 50;
+            this.hitboxHeight = [50, 30, 15, 14, 30];
             this.image = document.getElementById("enemyImage");
+            this.frameX = 0;
+            this.maxFrameX = 4;
+            this.frameTimer = 0;
+            this.frameInterval = 1000/10;
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
             this.speed = 3;
@@ -496,13 +501,25 @@ window.addEventListener('load', function(){
         draw(context){
             context.strokeStyle = 'white';
             context.beginPath();
-            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.hitboxHeight[this.frameX]/2, 0, 0, Math.PI*2);
             context.stroke();
-            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
 
-        update(){
+        update(deltaTime){
+            //move enemy
             this.x -= this.speed;
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX === this.maxFrameX) {
+                    this.frameX = 0;
+                } else {
+                    this.frameX++;
+                }
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
             //if enemy goes off screen, delete
             if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
@@ -627,6 +644,7 @@ window.addEventListener('load', function(){
             this.fireInterval = (Math.random() * 2000)+1000;
             this.shield = 6;
             this.frameY = 0;
+            this.hitboxHeight = [90];
         }
 
         draw(context) {
@@ -676,6 +694,22 @@ window.addEventListener('load', function(){
             this.image = document.getElementById("itemRobot");
             this.speed = 3;
             this.willFire = false;
+            this.hitboxHeight = [55];
+        }
+
+        draw(context) {
+            context.strokeStyle = 'white';
+            context.beginPath();
+            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.hitboxHeight[this.frameX]/2, 0, 0, Math.PI*2);
+            context.stroke();
+            context.drawImage(this.image, this.x, this.y, this.width, this.height);
+        }
+
+        update(){
+            //move enemy
+            this.x -= this.speed;
+            //if enemy goes off screen, delete
+            if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
     }
 
@@ -847,7 +881,7 @@ window.addEventListener('load', function(){
                                         enemy.x + enemy.width/2,
                                         enemy.y + enemy.height/2,
                                         enemy.width/2,
-                                        enemy.height/2,
+                                        enemy.hitboxHeight[enemy.frameX]/2,
                                         true,
                                         false)) {
                         if(enemy.shield <= 0){
@@ -1008,7 +1042,7 @@ window.addEventListener('load', function(){
                                         enemy.x + enemy.width / 2,
                                         enemy.y + enemy.height / 2,
                                         enemy.width / 2,
-                                        enemy.height / 2,
+                                        enemy.hitboxHeight[enemy.frameX] / 2,
                                         true,
                                         false)) {
                         if(enemy.shield <= 0) {
