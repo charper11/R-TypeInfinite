@@ -1,14 +1,12 @@
 window.addEventListener('load', function(){
+    const GAME_WIDTH = 705;
+    const GAME_HEIGHT = 480;
+    const INFO_HEIGHT = 50;
     const canvas = document.getElementById('gamePlayCanvas');
     // ctx = instance of built-in canvas 2D api that holds all drawing methods/properties
     const ctx = canvas.getContext('2d');
-    canvas.width = 705;
-    canvas.height = 490;
-
-    const gameBarCanvas = document.getElementById('gameBarCanvas');
-    const barCtx = gameBarCanvas.getContext('2d');
-    gameBarCanvas.width = 900;
-    gameBarCanvas.height = 50;
+    canvas.width = GAME_WIDTH;
+    canvas.height = GAME_HEIGHT + INFO_HEIGHT;
 
     let enemies = [];
     let enemyFires = [];
@@ -74,7 +72,7 @@ window.addEventListener('load', function(){
 
     //endlessly scrolling background
     function background() {
-        if(stars.length < 100) stars.push(new Star(canvas.width, canvas.height, canvas.width));
+        if(stars.length < 100) stars.push(new Star(canvas.width, GAME_HEIGHT, canvas.width));
         stars.forEach(star => {
             star.draw(ctx);
             star.update();
@@ -313,9 +311,9 @@ window.addEventListener('load', function(){
                     // handle item drop if player shoots item robot
                     if(enemy.name === "itemRobot"){
                         if(equippedForce.length === 0){
-                            force.push(new ForceItem(canvas.width, canvas.height));
+                            force.push(new ForceItem(canvas.width, GAME_HEIGHT));
                         } else {
-                            shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                            shields.push(new ShieldItem(canvas.width, GAME_HEIGHT, enemy.x, enemy.y));
                         }
                     }
                 }
@@ -357,23 +355,23 @@ window.addEventListener('load', function(){
         } else if(beamPower) {
             switch(beamPower) {
                 case 1:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 32, 8, "charge1Image", 1, 25));
+                    playerBeams.push(new PlayerBeam(canvas.width, GAME_HEIGHT, x, y, 32, 8, "charge1Image", 1, 25));
                     break;
                 case 2:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 34, 24, "charge2Image", 2, 20));
+                    playerBeams.push(new PlayerBeam(canvas.width, GAME_HEIGHT, x, y, 34, 24, "charge2Image", 2, 20));
                     break;
                 case 3:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 66, 24, "charge3Image", 3, 15));
+                    playerBeams.push(new PlayerBeam(canvas.width, GAME_HEIGHT, x, y, 66, 24, "charge3Image", 3, 15));
                     break;
                 case 4:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 98, 28, "charge4Image", 4, 15));
+                    playerBeams.push(new PlayerBeam(canvas.width, GAME_HEIGHT, x, y, 98, 28, "charge4Image", 4, 15));
                     break;
                 case 5:
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 130, 28, "charge5Image", 5, 15));
+                    playerBeams.push(new PlayerBeam(canvas.width, GAME_HEIGHT, x, y, 130, 28, "charge5Image", 5, 15));
                     break;
                 default:
                     //6
-                    playerBeams.push(new PlayerBeam(canvas.width, canvas.height, x, y, 161, 32, "charge6Image", 6, 15));
+                    playerBeams.push(new PlayerBeam(canvas.width, GAME_HEIGHT, x, y, 161, 32, "charge6Image", 6, 15));
             }
             beamTimer = 0;
             beamPower = 0;
@@ -512,7 +510,7 @@ window.addEventListener('load', function(){
         fire(deltaTime){
             if(this.fireTimer > this.fireInterval){
                 const angle = this.getFireAngle();
-                enemyFires.push(new EnemyFire(canvas.width, canvas.height, this.x, this.y, Math.cos(angle), Math.sin(angle)));
+                enemyFires.push(new EnemyFire(canvas.width, GAME_HEIGHT, this.x, this.y, Math.cos(angle), Math.sin(angle)));
                 this.willFire = false;
                 this.fireTimer = 0;
             } else {
@@ -533,11 +531,11 @@ window.addEventListener('load', function(){
             // each enemy has a 25% of firing
             const willFire = Math.random() < 0.25;
             if(bottomWall.length === 0 && topWall.length === 0) {
-                enemies.push(new Enemy(canvas.width, canvas.height, willFire));
+                enemies.push(new Enemy(canvas.width, GAME_HEIGHT, willFire));
             } else if(bottomWall.length > 0 && topWall.length > 0) {
-                enemies.push(new Enemy(canvas.width, canvas.height-(bottomWall[0].height*2), willFire));
+                enemies.push(new Enemy(canvas.width, GAME_HEIGHT-(bottomWall[0].height*2), willFire));
             } else {
-                enemies.push(new Enemy(canvas.width, canvas.height-64, willFire));
+                enemies.push(new Enemy(canvas.width, GAME_HEIGHT-64, willFire));
             }
             enemyTimer = 0;
             randomEnemyInterval = Math.random()*1000;
@@ -655,11 +653,11 @@ window.addEventListener('load', function(){
     function handleLargeEnemies(deltaTime){
         if(largeEnemyTimer > largeEnemyInterval) {
             if(bottomWall.length === 0 && topWall.length === 0) {
-                enemies.push(new LargeEnemy(canvas.width, canvas.height));
+                enemies.push(new LargeEnemy(canvas.width, GAME_HEIGHT));
             } else if(bottomWall.length > 0 && topWall.length > 0) {
-                enemies.push(new LargeEnemy(canvas.width, canvas.height-(bottomWall[0].height*2)));
+                enemies.push(new LargeEnemy(canvas.width, GAME_HEIGHT-(bottomWall[0].height*2)));
             } else {
-                enemies.push(new LargeEnemy(canvas.width, canvas.height-64));
+                enemies.push(new LargeEnemy(canvas.width, GAME_HEIGHT-64));
             }
             largeEnemyTimer = 0;
             largeEnemyInterval = Math.random() * 10000;
@@ -685,11 +683,11 @@ window.addEventListener('load', function(){
     function handleItemRobots(deltaTime){
         if(robotTimer > randomRobotInterval) {
             if(bottomWall.length === 0 && topWall.length === 0) {
-                enemies.push(new ItemRobot(canvas.width, canvas.height));
+                enemies.push(new ItemRobot(canvas.width, GAME_HEIGHT));
             } else if(bottomWall.length > 0 && topWall.length > 0) {
-                enemies.push(new ItemRobot(canvas.width, canvas.height-(bottomWall[0].height*2)));
+                enemies.push(new ItemRobot(canvas.width, GAME_HEIGHT-(bottomWall[0].height*2)));
             } else {
-                enemies.push(new ItemRobot(canvas.width, canvas.height-64));
+                enemies.push(new ItemRobot(canvas.width, GAME_HEIGHT-64));
             }
             robotTimer = 0;
             randomRobotInterval = Math.random() * 30000;
@@ -864,9 +862,9 @@ window.addEventListener('load', function(){
                         // handle item drop if shield hits item robot
                         if(enemy.name === "itemRobot"){
                             if(equippedForce.length === 0){
-                                force.push(new ForceItem(canvas.width, canvas.height));
+                                force.push(new ForceItem(canvas.width, GAME_HEIGHT));
                             } else {
-                                shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                                shields.push(new ShieldItem(canvas.width, GAME_HEIGHT, enemy.x, enemy.y));
                             }
                         }
                     }
@@ -1024,7 +1022,7 @@ window.addEventListener('load', function(){
                         score += 10;
                         // handle item drop if player shoots item robot
                         if(enemy.name === "itemRobot"){
-                            shields.push(new ShieldItem(canvas.width, canvas.height, enemy.x, enemy.y));
+                            shields.push(new ShieldItem(canvas.width, GAME_HEIGHT, enemy.x, enemy.y));
                         }
                     }
                 });
@@ -1104,7 +1102,7 @@ window.addEventListener('load', function(){
         if(wallTimer > wallInterval) {
             //get size of wall
             const count = (Math.random()*20)+10;
-            bottomWall.push(new BottomWall(canvas.width, canvas.height, count));
+            bottomWall.push(new BottomWall(canvas.width, GAME_HEIGHT, count));
             wallTimer = 0;
             wallInterval = Math.random()*100000;
         } else {
@@ -1135,7 +1133,7 @@ window.addEventListener('load', function(){
         if(topWallTimer > topWallInterval) {
             //get size of wall
             const count = (Math.random()*20)+10;
-            topWall.push(new TopWall(canvas.width, canvas.height, count));
+            topWall.push(new TopWall(canvas.width, GAME_HEIGHT, count));
             topWallTimer = 0;
             topWallInterval = Math.random()*100000;
         } else {
@@ -1150,28 +1148,28 @@ window.addEventListener('load', function(){
     }
 
     //display score and game over message
-    function displayStatusText(gameContext, barContext){
-        displayBeamStatus(barContext);
-        barContext.fillStyle = 'white';
-        barContext.font = '20px Orbitron';
-        barContext.fillText('Beam ', 200, 20);
-        barContext.fillText('Score: ' + score, 20, 30);
-        barContext.fillText('Hi: ' + localStorage.getItem('hiScore'), 500, 30);
+    function displayStatusText(context){
+        displayBeamStatus(context);
+        context.fillStyle = 'white';
+        context.font = '20px Orbitron';
+        context.fillText('Beam ', 200, GAME_HEIGHT+20);
+        context.fillText('Score: ' + score, 20, GAME_HEIGHT+30);
+        context.fillText('Hi: ' + localStorage.getItem('hiScore'), 500, GAME_HEIGHT+30);
         if(gameOver){
-            gameContext.fillStyle = 'white';
-            gameContext.font = '20px Orbitron';
-            gameContext.textAlign = 'center';
-            gameContext.fillText('GAME OVER', canvas.width/2, canvas.height/2);
-            gameContext.fillText('Press SPACE to play again', canvas.width/2, canvas.height/2+100);
+            context.fillStyle = 'white';
+            context.font = '20px Orbitron';
+            context.textAlign = 'center';
+            context.fillText('GAME OVER', canvas.width/2, GAME_HEIGHT/2);
+            context.fillText('Press SPACE to play again', canvas.width/2, GAME_HEIGHT/2+100);
         }
     }
 
     //beam icon
-    function displayBeamStatus(barContext){
-        barContext.fillStyle = "blue";
-        barContext.fillRect(300, 5, 10*beamPower, 15);
-        barContext.strokeStyle = "white";
-        barContext.strokeRect(300, 5, 100, 15);
+    function displayBeamStatus(context){
+        context.fillStyle = "blue";
+        context.fillRect(300, GAME_HEIGHT+5, 10*beamPower, 15);
+        context.strokeStyle = "white";
+        context.strokeRect(300, GAME_HEIGHT+5, 100, 15);
     }
 
     function updateScore(deltaTime){
@@ -1185,9 +1183,9 @@ window.addEventListener('load', function(){
     }
 
     const input = new InputHandler();
-    const player = new Player(canvas.width, canvas.height);
+    const player = new Player(canvas.width, GAME_HEIGHT);
     //add stars for the game start
-    for(let i = 0; i < 100; i++) stars.push(new Star(canvas.width, canvas.height, Math.random() * canvas.width));
+    for(let i = 0; i < 100; i++) stars.push(new Star(canvas.width, GAME_HEIGHT, Math.random() * canvas.width));
     //helper vars for generating enemies on time
     let lastTime = 0;
     let enemyTimer = 0;
@@ -1215,7 +1213,6 @@ window.addEventListener('load', function(){
         const deltaTime = timeStamp - lastTime;
         lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
-        barCtx.clearRect(0,0,gameBarCanvas.width, gameBarCanvas.height);
         background();
         player.draw(ctx);
         player.update(input);
@@ -1233,7 +1230,7 @@ window.addEventListener('load', function(){
         handleBottomWall(deltaTime);
         handleTopWall(deltaTime);
         updateScore(deltaTime);
-        displayStatusText(ctx, barCtx);
+        displayStatusText(ctx);
         if(!gameOver) requestAnimationFrame(animate);
     }
     animate(0);

@@ -15,14 +15,6 @@ body {
     border: 5px solid white;
 }
 
-#gameBarCanvas {
-    position: absolute;
-    left: 50%;
-    top: 92%;
-    transform: translate(-50%, -50%);
-    border: 5px solid red;
-}
-
 #playerImage, #charge1Image, #charge2Image, #charge3Image, #charge4Image,
 #charge5Image, #charge6Image, #enemyImage, #shieldImage, #forceImage,
 #wallStart, #wallMiddle, #wallEnd, #enemyFire, #itemRobot, #topWallStart,
