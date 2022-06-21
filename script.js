@@ -118,7 +118,7 @@ window.addEventListener('load', function(){
             this.height = 30;
             this.frameX = 2;
             this.frameWait = 0;
-            this.x = 0;
+            this.x = 150;
             this.y = gameHeight/2 - this.height;
             this.image = document.getElementById('playerImage');
             this.xSpeed = 0;
