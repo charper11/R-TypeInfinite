@@ -258,7 +258,7 @@ window.addEventListener('load', function(){
             this.maxFrame = 1;
             this.frameInterval = 1000/20;
             this.x = x;
-            this.y = y;
+            this.y = y-this.height/2;
             this.speed = speed;
             this.power = power;
             this.markedForDeletion = false;
