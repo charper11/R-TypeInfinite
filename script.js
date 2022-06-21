@@ -1149,6 +1149,9 @@ window.addEventListener('load', function(){
 
     //display score and game over message
     function displayStatusText(context){
+        //give info bar distinguished color
+        context.fillStyle = 'rgb(40, 40, 43)';
+        context.fillRect(0, GAME_HEIGHT, GAME_WIDTH, INFO_HEIGHT);
         displayBeamStatus(context);
         context.fillStyle = 'white';
         context.font = '20px Orbitron';
