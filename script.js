@@ -523,7 +523,7 @@ window.addEventListener('load', function(){
             this.frameTimer = 0;
             this.frameInterval = 1000/10;
             this.x = this.gameWidth;
-            this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
+            this.y = Math.random() * (this.gameHeight - this.height - (bottomWall.length * 64) - (topWall.length*64)) + (topWall.length * 64);
             this.speed = 4;
             this.willFire = willFire;
             this.fireInterval = (Math.random() * (this.gameWidth / (this.speed*60)))*1000;
