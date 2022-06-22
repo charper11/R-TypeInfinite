@@ -524,7 +524,7 @@ window.addEventListener('load', function(){
             this.frameInterval = 1000/10;
             this.x = this.gameWidth;
             this.y = Math.random() * (this.gameHeight - this.height) + (topWall.length * 64);
-            this.speed = 3;
+            this.speed = 4;
             this.willFire = willFire;
             this.fireInterval = (Math.random() * (this.gameWidth / (this.speed*60)))*1000;
             this.fireTimer = 0;
@@ -687,6 +687,7 @@ window.addEventListener('load', function(){
             this.shield = 6;
             this.frameY = 0;
             this.hitboxHeight = [90];
+            this.speed = 2;
         }
 
         draw(context) {
