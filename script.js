@@ -773,7 +773,7 @@ window.addEventListener('load', function(){
                 enemies.push(new ItemRobot(canvas.width, GAME_HEIGHT-64));
             }
             robotTimer = 0;
-            randomRobotInterval = Math.random() * 30000;
+            randomRobotInterval = (Math.random() * 30000) + 15000;
         } else {
             robotTimer += deltaTime;
         }
@@ -1187,7 +1187,7 @@ window.addEventListener('load', function(){
             const count = (Math.random()*20)+10;
             bottomWall.push(new BottomWall(canvas.width, GAME_HEIGHT, count));
             wallTimer = 0;
-            wallInterval = Math.random()*100000;
+            wallInterval = Math.random()*30000;
         } else {
             if(bottomWall.length === 0) wallTimer += deltaTime;
         }
@@ -1218,7 +1218,7 @@ window.addEventListener('load', function(){
             const count = (Math.random()*20)+10;
             topWall.push(new TopWall(canvas.width, GAME_HEIGHT, count));
             topWallTimer = 0;
-            topWallInterval = Math.random()*100000;
+            topWallInterval = Math.random()*30000;
         } else {
             if(topWall.length === 0) topWallTimer += deltaTime;
         }
