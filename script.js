@@ -738,6 +738,9 @@ window.addEventListener('load', function(){
             this.speed = 3;
             this.willFire = false;
             this.hitboxHeight = [55];
+            this.a = (gameHeight-this.height)/64;
+            this.phase = 0;
+            this.y = Math.random() * (this.gameHeight/2 - this.height - (bottomWall.length * 32) - (topWall.length * 32)) + (topWall.length * 64);
         }
 
         draw(context) {
@@ -748,9 +751,12 @@ window.addEventListener('load', function(){
             context.drawImage(this.image, this.x, this.y, this.width, this.height);
         }
 
-        update(){
+        update(deltaTime){
             //move enemy
             this.x -= this.speed;
+            this.y = this.y + (this.a * Math.sin(2 * Math.PI + this.phase));
+            this.phase += 0.05;
+
             //if enemy goes off screen, delete
             if(this.x < 0 - this.width) this.markedForDeletion = true;
         }
