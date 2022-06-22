@@ -23,6 +23,7 @@ window.addEventListener('load', function(){
     let sparks = [];
     let score = 0;
     let gameOver = false;
+    let playerExplosion = null;
 
     //detect collision of two ellipsoids
     function collisionDetection(X1, Y1, W1, H1, X2, Y2, W2, H2, isCircle1, isCircle2) {
@@ -123,11 +124,12 @@ window.addEventListener('load', function(){
             this.image = document.getElementById('playerImage');
             this.xSpeed = 0;
             this.ySpeed = 0;
+            this.hit = false;
         }
         draw(context){
             context.strokeStyle = 'white';
             context.beginPath();
-            context.ellipse(this.x + this.width/2, this.y + this.height/2, this.width/2, this.height/2, 0, 0, Math.PI*2);
+            context.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, this.height / 2, 0, 0, Math.PI * 2);
             context.stroke();
             context.drawImage(this.image, this.width * this.frameX, 0, this.width, this.height, this.x, this.y, this.width, this.height);
         }
@@ -205,7 +207,8 @@ window.addEventListener('load', function(){
                                        enemy.hitboxHeight[enemy.frameX]/2,
                                        false,
                                        false)) {
-                    gameOver = true;
+                    if(playerExplosion === null) playerExplosion = new PlayerExplosion(this.x, this.y);
+                    this.hit = true;
                 }
             });
 
@@ -221,7 +224,8 @@ window.addEventListener('load', function(){
                                        fire.height/2,
                                        false,
                                        true)) {
-                    gameOver = true;
+                    if(playerExplosion === null) playerExplosion = new PlayerExplosion(this.x, this.y);
+                    this.hit = true;
                 }
             });
 
@@ -231,7 +235,8 @@ window.addEventListener('load', function(){
                    this.x + this.width > w.x &&
                    this.y < w.hitboxY + w.hitboxHeight &&
                    this.y + this.height > w.hitboxY){
-                       gameOver = true;
+                    if(playerExplosion === null) playerExplosion = new PlayerExplosion(this.x, this.y);
+                    this.hit = true;
                    }
             });
             topWall.forEach(w => {
@@ -239,7 +244,8 @@ window.addEventListener('load', function(){
                    this.x + this.width > w.x &&
                    this.y < w.hitboxY + w.hitboxHeight &&
                    this.y + this.height > w.hitboxY){
-                       gameOver = true;
+                    if(playerExplosion === null) playerExplosion = new PlayerExplosion(this.x, this.y);
+                    this.hit = true;
                    }
             });
         }
@@ -464,12 +470,40 @@ window.addEventListener('load', function(){
         }
     }
 
+    class PlayerExplosion extends Explosion {
+        constructor(x,y){
+            super(x,y);
+            this.image = document.getElementById("playerExplosion");
+            this.frameX = 7;
+            this.width = 66;
+            this.height = 56;
+        }
+
+        update(deltaTime){
+            this.x--;
+            //handle sprite
+            if (this.frameTimer > this.frameInterval) {
+                if (this.frameX <= 0) gameOver = true;
+                else this.frameX--;
+                this.frameTimer = 0;
+            } else {
+                this.frameTimer += deltaTime;
+            }
+        }
+    }
+
     //animate and remove explosion
     function handleExplosions(deltaTime) {
+        //enemy explosions
         explosions.forEach(explosion => {
             explosion.draw(ctx);
             explosion.update(deltaTime);
         });
+        //player explosion
+        if(playerExplosion !== null){
+            playerExplosion.draw(ctx);
+            playerExplosion.update(deltaTime);
+        }
         //remove finished explosions
         explosions = explosions.filter(explosion => !explosion.markedForDeletion);
     }
@@ -1259,10 +1293,12 @@ window.addEventListener('load', function(){
         lastTime = timeStamp;
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background();
-        player.draw(ctx);
-        player.update(input);
-        handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
-        handleSparks(player.x+player.width-10, player.y-player.height/2, deltaTime);
+        if(!player.hit){
+            player.draw(ctx);
+            player.update(input);
+            handlePlayerBeam(input, player.x+player.width-10, player.y+player.height/2, deltaTime);
+            handleSparks(player.x+player.width-10, player.y-player.height/2, deltaTime);
+        }
         handleExplosions(deltaTime);
         handleEnemies(deltaTime);
         handleLargeEnemies(deltaTime);
