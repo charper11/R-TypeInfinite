@@ -1272,7 +1272,7 @@ playBtn.addEventListener('click', function(){
     //add stars for the game start
     for(let i = 0; i < 100; i++) stars.push(new Star(canvas.width, GAME_HEIGHT, Math.random() * canvas.width));
     //helper vars for generating enemies on time
-    let lastTime = 0;
+    let lastTime = window.performance.now();
     let enemyTimer = 0;
     let enemyInterval = 1000;
     let randomEnemyInterval = Math.random()*1000;
@@ -1320,5 +1320,5 @@ playBtn.addEventListener('click', function(){
         displayStatusText(ctx);
         if(!gameOver) requestAnimationFrame(animate);
     }
-    animate(0);
+    animate(window.performance.now());
 });
