@@ -1,4 +1,4 @@
-window.addEventListener('load', function(){
+playBtn.addEventListener('click', function(){
     const GAME_WIDTH = 705;
     const GAME_HEIGHT = 480;
     const INFO_HEIGHT = 50;
@@ -1246,7 +1246,6 @@ window.addEventListener('load', function(){
             context.font = '20px Orbitron';
             context.textAlign = 'center';
             context.fillText('GAME OVER', canvas.width/2, GAME_HEIGHT/2);
-            context.fillText('Press SPACE to play again', canvas.width/2, GAME_HEIGHT/2+100);
         }
     }
 
